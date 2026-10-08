@@ -30,7 +30,6 @@
       "icons/icon.ico"
     ],
     "resources": ["resources/engine"],
-    "licenseFile": "../../LICENSE",
     "category": "DeveloperTool",
     "shortDescription": "Local-first responsive testing and visual regression",
     "longDescription": "MadScope renders websites across viewport sizes, captures screenshots, detects responsive issues, and runs visual regression tests locally."

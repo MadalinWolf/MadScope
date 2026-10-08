@@ -47,6 +47,12 @@ jobs:
         with:
           targets: ${{ matrix.target }}
 
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop/src-tauri
+          key: ${{ matrix.target }}
+
       - name: Install Linux Tauri dependencies
         if: runner.os == 'Linux'
         run: |
@@ -102,7 +108,7 @@ jobs:
           test "$(stat -c%s "$APP")" -gt 40000000
           test "$(stat -c%s "$DEB")" -gt 40000000
           dpkg-deb --info "$DEB"
-          tmp=$(mktemp -d) && (cd "$tmp" && "$APP" --appimage-extract >/dev/null) && ls "$tmp/squashfs-root/usr/bin"
+          tmp=$(mktemp -d) && (cd "$tmp" && "$(pwd)/$APP" --appimage-extract >/dev/null) && ls "$tmp/squashfs-root/usr/bin"
 
       - name: Upload raw bundles
         uses: actions/upload-artifact@v4
