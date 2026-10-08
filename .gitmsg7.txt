@@ -1,1 +1,0 @@
-fix: declare the Tauri library target name
