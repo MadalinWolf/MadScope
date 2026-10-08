@@ -19,8 +19,8 @@ ms-playwright/
 # MadScope local data (generated screenshots, baselines, results)
 .madscope/
 madscope-results/
-screenshots/
-baselines/
+/screenshots/
+/baselines/
 
 # Env / secrets
 .env
