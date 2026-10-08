@@ -5,3 +5,5 @@ node_modules
 verify-tmp
 coverage
 apps/desktop/dist
+apps/desktop/src-tauri/resources
+apps/desktop/src-tauri/target

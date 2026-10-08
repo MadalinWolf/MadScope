@@ -1,4 +1,10 @@
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  writeFileSync,
+} from "node:fs";
 import { basename, join, resolve } from "node:path";
 import type { ViewportConfig } from "@madscope/shared";
 
@@ -19,14 +25,20 @@ export function slugifyUrl(url: string): string {
   try {
     const u = new URL(url);
     const host = u.hostname.replace(/^www\./, "").replace(/[^a-z0-9]+/gi, "-");
-    const path = u.pathname.replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "");
+    const path = u.pathname
+      .replace(/[^a-z0-9]+/gi, "-")
+      .replace(/^-+|-+$/g, "");
     return `${host}${path ? `-${path}` : ""}`.slice(0, 80) || "page";
   } catch {
     return url.replace(/[^a-z0-9]+/gi, "-").slice(0, 80) || "page";
   }
 }
 
-export function buildScreenshotFilename(url: string, viewport: ViewportConfig, ext = "png"): string {
+export function buildScreenshotFilename(
+  url: string,
+  viewport: ViewportConfig,
+  ext = "png",
+): string {
   const ts = new Date().toISOString().replace(/[:.]/g, "-");
   return `${slugifyUrl(url)}-${viewport.id}-${viewport.width}x${viewport.height}-${ts}.${ext}`;
 }
@@ -61,7 +73,11 @@ export function saveScreenshot(params: {
     fullPage: params.fullPage ?? false,
     title: params.title,
   };
-  writeFileSync(resolve(outDir, `${meta.id}.json`), JSON.stringify(meta, null, 2), "utf-8");
+  writeFileSync(
+    resolve(outDir, `${meta.id}.json`),
+    JSON.stringify(meta, null, 2),
+    "utf-8",
+  );
   appendToHistory(outDir, meta);
   return meta;
 }
@@ -89,11 +105,17 @@ export function listHistory(outDir: string): ScreenshotMetadata[] {
   if (!existsSync(file)) {
     // Fall back to scanning sidecar json files
     if (!existsSync(outDir)) return [];
-    const entries = readdirSync(outDir).filter((f) => f.endsWith(".json") && f !== "history.json");
+    const entries = readdirSync(outDir).filter(
+      (f) => f.endsWith(".json") && f !== "history.json",
+    );
     const metas: ScreenshotMetadata[] = [];
     for (const e of entries) {
       try {
-        metas.push(JSON.parse(readFileSync(join(outDir, e), "utf-8")) as ScreenshotMetadata);
+        metas.push(
+          JSON.parse(
+            readFileSync(join(outDir, e), "utf-8"),
+          ) as ScreenshotMetadata,
+        );
       } catch {
         // skip corrupt sidecar
       }
@@ -101,8 +123,14 @@ export function listHistory(outDir: string): ScreenshotMetadata[] {
     return metas.sort((a, b) => (a.timestamp < b.timestamp ? 1 : -1));
   }
   try {
-    const list = JSON.parse(readFileSync(file, "utf-8")) as ScreenshotMetadata[];
-    return list.filter((m) => existsSync(m.screenshotPath) || existsSync(resolve(outDir, basename(m.screenshotPath))));
+    const list = JSON.parse(
+      readFileSync(file, "utf-8"),
+    ) as ScreenshotMetadata[];
+    return list.filter(
+      (m) =>
+        existsSync(m.screenshotPath) ||
+        existsSync(resolve(outDir, basename(m.screenshotPath))),
+    );
   } catch {
     return [];
   }

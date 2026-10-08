@@ -17,6 +17,9 @@ app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
 const PORT = Number(process.env.MADSCOPE_PORT ?? 4220);
+// Working directory for config lookup and .madscope storage.
+// The Tauri bundle sets this to the app data dir; in dev it is the cwd.
+const DATA_DIR = process.env.MADSCOPE_DATA_DIR ?? process.cwd();
 
 function toViewport(input: {
   id?: string;
@@ -50,7 +53,7 @@ function toViewport(input: {
 }
 
 app.get("/api/health", (_req, res) => {
-  res.json({ ok: true, app: "MadScope", version: "0.1.0" });
+  res.json({ ok: true, app: "MadScope", version: "1.0.0" });
 });
 
 app.get("/api/presets", (_req, res) => {
@@ -74,7 +77,7 @@ app.post("/api/scan", async (req, res) => {
     return;
   }
   try {
-    const base = await loadConfig(process.cwd());
+    const base = await loadConfig(DATA_DIR);
     const config = mergeConfig(
       base,
       fullPage !== undefined
@@ -95,7 +98,10 @@ app.post("/api/scan", async (req, res) => {
       res.status(400).json({ error: "Select at least one viewport." });
       return;
     }
-    const scan = await scanUrl(v.url, vps, config, { includeBase64: true });
+    const scan = await scanUrl(v.url, vps, config, {
+      cwd: DATA_DIR,
+      includeBase64: true,
+    });
     res.json(scan);
   } catch (err) {
     res
@@ -120,7 +126,7 @@ app.post("/api/baseline", async (req, res) => {
     return;
   }
   try {
-    const base = await loadConfig(process.cwd());
+    const base = await loadConfig(DATA_DIR);
     const config = mergeConfig(base, {});
     const vps: ViewportConfig[] = (viewports ?? []).map((x) => {
       if (x.id) {
@@ -132,7 +138,7 @@ app.post("/api/baseline", async (req, res) => {
       }
       return toViewport(x);
     });
-    const entries = await createBaseline(v.url, vps, config);
+    const entries = await createBaseline(v.url, vps, config, DATA_DIR);
     res.json({ entries });
   } catch (err) {
     res
@@ -157,7 +163,7 @@ app.post("/api/test", async (req, res) => {
     return;
   }
   try {
-    const base = await loadConfig(process.cwd());
+    const base = await loadConfig(DATA_DIR);
     const config = mergeConfig(base, {});
     const vps: ViewportConfig[] = (viewports ?? []).map((x) => {
       if (x.id) {
@@ -169,7 +175,7 @@ app.post("/api/test", async (req, res) => {
       }
       return toViewport(x);
     });
-    const report = await runRegressionTest(v.url, vps, config);
+    const report = await runRegressionTest(v.url, vps, config, DATA_DIR);
     // Attach base64 for UI preview (actual + diff)
     const withImages = report.cases.map((c) => {
       let actualBase64: string | undefined;
@@ -194,8 +200,8 @@ app.post("/api/test", async (req, res) => {
 
 app.get("/api/history", async (_req, res) => {
   try {
-    const base = await loadConfig(process.cwd());
-    const dir = resolve(process.cwd(), base.outDir);
+    const base = await loadConfig(DATA_DIR);
+    const dir = resolve(DATA_DIR, base.outDir);
     res.json({ items: listHistory(dir) });
   } catch (err) {
     res

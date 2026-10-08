@@ -1,20 +1,36 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "MadScope",
-  "version": "0.1.0",
-  "identifier": "dev.madscope.app",
+  "version": "1.0.0",
+  "identifier": "com.madwolfstudios.madscope",
   "build": {
     "devUrl": "http://localhost:1420",
     "frontendDist": "../dist"
   },
   "app": {
-    "windows": [{ "title": "MadScope", "width": 1280, "height": 860 }],
+    "windows": [
+      {
+        "label": "main",
+        "title": "MadScope",
+        "width": 1280,
+        "height": 860,
+        "visible": false
+      }
+    ],
     "security": { "csp": null }
   },
   "bundle": {
     "active": true,
     "targets": "all",
-    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "resources": ["resources/engine"],
+    "licenseFile": "../../LICENSE",
     "category": "DeveloperTool",
     "shortDescription": "Local-first responsive testing and visual regression",
     "longDescription": "MadScope renders websites across viewport sizes, captures screenshots, detects responsive issues, and runs visual regression tests locally."

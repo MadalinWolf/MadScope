@@ -25,7 +25,7 @@ program
   .description(
     "MadScope — local-first responsive testing and visual regression",
   )
-  .version("0.1.0");
+  .version("1.0.0");
 
 function resolveViewports(opts: {
   viewport?: string[];
@@ -171,6 +171,7 @@ program
   .option("--height <n>", "custom height")
   .option("--full-page", "capture full-page screenshots")
   .option("--threshold <n>", "override diff threshold 0..1")
+  .option("--json", "print the report as JSON (for CI integrations)")
   .action(async (url: string, opts) => {
     const v = validateUrl(url);
     if (!v.ok) {
@@ -189,6 +190,43 @@ program
       const report = await runRegressionTest(v.url, viewports, config);
       let failed = false;
       for (const c of report.cases) {
+        if (
+          c.status === "fail" ||
+          c.status === "error" ||
+          c.status === "no-baseline"
+        )
+          failed = true;
+      }
+      if (opts.json) {
+        console.log(
+          JSON.stringify(
+            {
+              url: report.url,
+              passed: report.passed,
+              threshold: config.diffThreshold,
+              cases: report.cases.map((c) => ({
+                viewport: c.viewport.id,
+                name: c.viewport.name,
+                width: c.viewport.width,
+                height: c.viewport.height,
+                status: c.status,
+                changeRatio: c.changeRatio ?? null,
+                changedPixels: c.changedPixels ?? null,
+                threshold: c.threshold,
+                baselineFile: c.baselineFile ?? null,
+                actualFile: c.actualFile ?? null,
+                diffFile: c.diffFile ?? null,
+                message: c.message,
+              })),
+            },
+            null,
+            2,
+          ),
+        );
+        if (failed) process.exitCode = 1;
+        return;
+      }
+      for (const c of report.cases) {
         const icon =
           c.status === "pass" ? "✓" : c.status === "fail" ? "✗" : "?";
         const extra =
@@ -198,12 +236,6 @@ program
         console.log(
           `${icon} ${c.viewport.name} ${c.viewport.width}×${c.viewport.height} — ${c.message}${extra}`,
         );
-        if (
-          c.status === "fail" ||
-          c.status === "error" ||
-          c.status === "no-baseline"
-        )
-          failed = true;
       }
       if (failed) {
         console.log("\nVisual difference detected or baseline missing.");

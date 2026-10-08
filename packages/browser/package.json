@@ -1,6 +1,6 @@
 {
   "name": "@madscope/browser",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Reusable Playwright browser engine for MadScope",
   "license": "MIT",
   "type": "module",
@@ -21,8 +21,8 @@
     "clean": "rimraf dist *.tsbuildinfo"
   },
   "dependencies": {
-    "@madscope/shared": "0.1.0",
-    "@madscope/config": "0.1.0",
+    "@madscope/shared": "1.0.0",
+    "@madscope/config": "1.0.0",
     "playwright": "^1.48.2"
   },
   "devDependencies": {

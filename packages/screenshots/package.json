@@ -1,6 +1,6 @@
 {
   "name": "@madscope/screenshots",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Screenshot storage, metadata and history for MadScope",
   "license": "MIT",
   "type": "module",
@@ -12,14 +12,16 @@
       "default": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc -b",
     "typecheck": "tsc --noEmit",
     "clean": "rimraf dist *.tsbuildinfo"
   },
   "dependencies": {
-    "@madscope/shared": "0.1.0"
+    "@madscope/shared": "1.0.0"
   },
   "devDependencies": {
     "typescript": "^5.5.4",

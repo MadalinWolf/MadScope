@@ -1,6 +1,8 @@
 # Roadmap
 
-## 0.1.0 (this release)
+## 1.0.0 (this release)
+
+Desktop installers (Windows/macOS/Linux, engine bundled), CLI `--json` output, version-sync tests, release automation.
 
 Core engine, browser, screenshots+history, issue detection+score, ruler, comparison UI, baselines+regression, config, CLI, docs, tests.
 

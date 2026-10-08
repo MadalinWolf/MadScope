@@ -11,10 +11,24 @@ export default tseslint.config(
       ".madscope/**",
       "verify-tmp/**",
       "apps/desktop/dist/**",
+      "apps/desktop/src-tauri/resources/**",
+      "apps/desktop/src-tauri/target/**",
     ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
+  {
+    files: ["**/scripts/**/*.mjs"],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "module",
+      globals: {
+        console: "readonly",
+        process: "readonly",
+        Buffer: "readonly",
+      },
+    },
+  },
   {
     rules: {
       "@typescript-eslint/no-unused-vars": [

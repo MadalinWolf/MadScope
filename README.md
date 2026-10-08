@@ -6,8 +6,23 @@ MadScope renders any URL in real Chromium across multiple viewport sizes, captur
 
 ![MadScope overview — responsive scan with health score](docs/images/madscope-overview.png)
 
-**Status:** v0.1.0 — working MVP: desktop UI, CLI, visual regression, automated tests.
+**Status:** v1.0.0 — desktop app (Windows/macOS/Linux installers via GitHub Releases), CLI, visual regression, automated tests.
 **License:** MIT — free and open source.
+
+## Download MadScope
+
+Latest release: [v1.0.0](https://github.com/MadalinWolf/MadScope/releases/tag/v1.0.0) · [all downloads](https://github.com/MadalinWolf/MadScope/releases)
+
+| Platform                    | Download                                                                                                                                      |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Windows x64 (MSI installer) | [MadScope-1.0.0-windows-x64.msi](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.0/MadScope-1.0.0-windows-x64.msi)             |
+| Windows x64 (setup wizard)  | [MadScope-1.0.0-windows-x64-setup.exe](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.0/MadScope-1.0.0-windows-x64-setup.exe) |
+| macOS Apple Silicon         | [MadScope-1.0.0-macos-arm64.dmg](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.0/MadScope-1.0.0-macos-arm64.dmg)             |
+| macOS Intel                 | [MadScope-1.0.0-macos-x64.dmg](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.0/MadScope-1.0.0-macos-x64.dmg)                 |
+| Linux x64 (portable)        | [MadScope-1.0.0-linux-x64.AppImage](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.0/MadScope-1.0.0-linux-x64.AppImage)       |
+| Linux x64 (Debian/Ubuntu)   | [MadScope-1.0.0-linux-x64.deb](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.0/MadScope-1.0.0-linux-x64.deb)                 |
+
+> macOS builds are unsigned: on first launch, right-click → **Open** → **Open**. Verify downloads against `CHECKSUMS.txt` on the release page.
 
 ---
 
@@ -21,7 +36,7 @@ What makes it different:
 
 - **Local-first.** No account, no cloud, no telemetry. The render server binds to `127.0.0.1`; screenshots stay in `.madscope/` on your disk.
 - **Real rendering.** Playwright + Chromium, per-viewport browser contexts (correct viewport, `isMobile`, touch, color scheme) — never static placeholders.
-- **Honest findings.** Every detection is labeled a *potential* issue, and the 0–100 health score is a documented, deterministic formula — not a black box.
+- **Honest findings.** Every detection is labeled a _potential_ issue, and the 0–100 health score is a documented, deterministic formula — not a black box.
 - **One engine, three surfaces.** The same `@madscope/core` powers the desktop UI, the `madscope` CLI, and CI.
 
 ## Why MadScope
@@ -41,7 +56,7 @@ MadScope makes the check systematic: render every viewport, screenshot everythin
 
 ### Issue detection
 
-Seven detectors, every finding worded as a *potential* issue with type, severity, message, selector, viewport and evidence:
+Seven detectors, every finding worded as a _potential_ issue with type, severity, message, selector, viewport and evidence:
 
 - horizontal overflow · element overflow · text clipping · image overflow · small touch targets · overlapping elements · off-screen elements
 
@@ -120,7 +135,7 @@ Regression result (pass / fail / no-baseline, exit code for CI)
 
 MadScope is local-first by construction, not just by policy:
 
-- The pages you test are fetched by *your* local Chromium and rendered in memory on your machine.
+- The pages you test are fetched by _your_ local Chromium and rendered in memory on your machine.
 - Screenshots and baselines are written to `.madscope/` in your working directory — nothing is uploaded anywhere (there is no upload code).
 - The desktop render server binds to `127.0.0.1`, so it is unreachable from the network.
 - There is no telemetry, analytics, account system, or API key in the codebase.
@@ -173,8 +188,22 @@ import { defineConfig } from "@madscope/config";
 export default defineConfig({
   urls: ["https://example.com"],
   viewports: [
-    { id: "mobile", name: "Mobile", width: 390, height: 844, isMobile: true, hasTouch: true },
-    { id: "tablet", name: "Tablet", width: 768, height: 1024, isMobile: true, hasTouch: true },
+    {
+      id: "mobile",
+      name: "Mobile",
+      width: 390,
+      height: 844,
+      isMobile: true,
+      hasTouch: true,
+    },
+    {
+      id: "tablet",
+      name: "Tablet",
+      width: 768,
+      height: 1024,
+      isMobile: true,
+      hasTouch: true,
+    },
     { id: "desktop", name: "Desktop", width: 1440, height: 900 },
   ],
   screenshot: {
@@ -200,12 +229,12 @@ Invalid values throw human-readable errors. Full reference: [`docs/configuration
 
 All screenshots below are real MadScope output (deterministic local fixtures, no mockups).
 
-| Main interface — scan across viewports | Issue detection with health score |
-|---|---|
+| Main interface — scan across viewports                        | Issue detection with health score                            |
+| ------------------------------------------------------------- | ------------------------------------------------------------ |
 | ![MadScope main interface](docs/images/madscope-overview.png) | ![MadScope issue detection](docs/images/madscope-issues.png) |
 
-| Visual comparison — overlay + slider |
-|---|
+| Visual comparison — overlay + slider                            |
+| --------------------------------------------------------------- |
 | ![MadScope visual comparison](docs/images/madscope-compare.png) |
 
 ## Development
@@ -233,11 +262,11 @@ npx tauri dev     # needs Rust toolchain
 npx tauri build   # needs Rust toolchain
 ```
 
-No native installer is published for v0.1.0 — the Tauri bundle requires a Rust toolchain and platform WebView dependencies (see [`docs/roadmap.md`](docs/roadmap.md)). The web UI + render server path is fully tested and is what Tauri loads via `devUrl`/`frontendDist`.
+Native installers are published via [GitHub Releases](https://github.com/MadalinWolf/MadScope/releases) (see Download below). The Tauri bundle embeds the full engine — portable Node, the render server and Chromium — so the app works offline after install with no extra setup. To build the installers yourself you need a Rust toolchain and platform WebView dependencies; `git tag v1.0.0 && git push origin v1.0.0` builds them on GitHub Actions (see [`.github/workflows/release.yml`](.github/workflows/release.yml)).
 
 ## Roadmap
 
-Done in v0.1.0: core engine, browser automation, screenshots + history, issue detection + score, comparison UI, baselines + regression, config, CLI, docs, tests.
+Done in v1.0.0: core engine, browser automation, screenshots + history, issue detection + score, comparison UI, baselines + regression, config, CLI, desktop installers, docs, tests.
 
 Next: GitHub Action with artifact upload, authenticated-session support (storage state/cookies with secret redaction), Firefox/WebKit engines, device presets, throttling, Tauri installers for Win/macOS/Linux. See [`docs/roadmap.md`](docs/roadmap.md).
 

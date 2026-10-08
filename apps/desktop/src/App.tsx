@@ -26,12 +26,24 @@ type ScanResponse = {
 
 const DEFAULT_SELECTED = ["mobile", "tablet", "desktop"];
 
+// In dev the Vite proxy forwards /api to the render server. In the packaged
+// app the UI is served from local files, so it talks to the bundled engine
+// on 127.0.0.1 directly (the port the Tauri sidecar is started with).
+const API_BASE = import.meta.env.DEV ? "" : "http://127.0.0.1:4220";
+
 async function api<T>(path: string, body?: unknown): Promise<T> {
-  const res = await fetch(path, {
-    method: body ? "POST" : "GET",
-    headers: body ? { "Content-Type": "application/json" } : undefined,
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      method: body ? "POST" : "GET",
+      headers: body ? { "Content-Type": "application/json" } : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+  } catch {
+    throw new Error(
+      "MadScope could not reach the local engine. If this persists, restart the app — the engine starts automatically with it.",
+    );
+  }
   const data = (await res.json()) as T & { error?: string };
   if (!res.ok) throw new Error(data.error ?? `Request failed (${res.status})`);
   return data;
@@ -52,6 +64,29 @@ export default function App() {
   const [opacity, setOpacity] = useState(0.5);
   const [slider, setSlider] = useState(50);
   const [testReport, setTestReport] = useState<string | null>(null);
+  const [engineReady, setEngineReady] = useState(false);
+
+  // The bundled engine can take a few seconds to start with the app.
+  useEffect(() => {
+    let cancelled = false;
+    const deadline = Date.now() + 120000;
+    const poll = async () => {
+      try {
+        await api<{ ok: boolean }>("/api/health");
+        if (!cancelled) setEngineReady(true);
+        return;
+      } catch {
+        // not up yet
+      }
+      if (!cancelled && Date.now() < deadline) {
+        window.setTimeout(poll, 1000);
+      }
+    };
+    void poll();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const allViewports: ApiViewport[] = useMemo(
     () => [
@@ -247,12 +282,18 @@ export default function App() {
               />
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !engineReady}
                 className="rounded bg-sky-500 px-4 py-2 text-sm font-semibold text-neutral-950 disabled:opacity-50"
               >
                 {loading ? "Rendering…" : "Render (R)"}
               </button>
             </div>
+            {!engineReady && (
+              <p role="status" className="text-sm text-neutral-400">
+                Starting the local engine… this takes a few seconds on first
+                launch.
+              </p>
+            )}
             {error && (
               <p id="url-error" role="alert" className="text-sm text-red-400">
                 {error}
