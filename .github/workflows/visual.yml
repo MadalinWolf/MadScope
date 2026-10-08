@@ -14,9 +14,14 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: npx playwright install chromium --with-deps
-      - run: node apps/cli/dist/index.js test https://example.com
+      - run: npm run build
+      # Screenshot run (exit 0): renders the URL at all configured viewports
+      # and uploads the images. For pass/fail regression, commit a
+      # .madscope/baselines manifest and run
+      # `node apps/cli/dist/index.js test <url>` instead (exit 1 on diffs).
+      - run: node apps/cli/dist/index.js screenshot https://example.com --viewport mobile tablet desktop
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: madscope-results
-          path: .madscope/results/
+          name: madscope-screenshots
+          path: .madscope/screenshots/
