@@ -1,7 +1,0 @@
-docs: professional README, community files, real screenshots
-
-- Rewrite README as product landing page (hero, why, features,
-  pipeline, privacy, quick start, config, real screenshots)
-- Add SECURITY.md, issue templates, PR template
-- Add docs/images with real MadScope captures
-- Add fixture serve helper for local verification
