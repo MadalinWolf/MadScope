@@ -140,12 +140,15 @@ jobs:
           set -e
           VER="${GITHUB_REF_NAME#v}"
           mkdir -p assets
-          for f in raw/*.msi; do cp "$f" "assets/MadScope-${VER}-windows-x64.msi"; done
-          for f in raw/*-setup.exe; do cp "$f" "assets/MadScope-${VER}-windows-x64-setup.exe"; done
-          for f in raw/*aarch64.dmg; do cp "$f" "assets/MadScope-${VER}-macos-arm64.dmg"; done
-          for f in raw/*x64.dmg; do cp "$f" "assets/MadScope-${VER}-macos-x64.dmg"; done
-          for f in raw/*.AppImage; do cp "$f" "assets/MadScope-${VER}-linux-x64.AppImage"; done
-          for f in raw/*.deb; do cp "$f" "assets/MadScope-${VER}-linux-x64.deb"; done
+          # Uploaded bundles keep their target/.../bundle/... subdirectories,
+          # so locate each artifact with find instead of fixed paths.
+          pick() { find raw -name "$1" | head -1; }
+          msi=$(pick '*.msi'); test -n "$msi"; cp "$msi" "assets/MadScope-${VER}-windows-x64.msi"
+          exe=$(pick '*-setup.exe'); test -n "$exe"; cp "$exe" "assets/MadScope-${VER}-windows-x64-setup.exe"
+          dmg_arm=$(pick '*aarch64.dmg'); test -n "$dmg_arm"; cp "$dmg_arm" "assets/MadScope-${VER}-macos-arm64.dmg"
+          dmg_x64=$(pick '*x64.dmg'); test -n "$dmg_x64"; cp "$dmg_x64" "assets/MadScope-${VER}-macos-x64.dmg"
+          appimage=$(pick '*.AppImage'); test -n "$appimage"; cp "$appimage" "assets/MadScope-${VER}-linux-x64.AppImage"
+          deb=$(pick '*.deb'); test -n "$deb"; cp "$deb" "assets/MadScope-${VER}-linux-x64.deb"
           ls -la assets
           test "$(ls assets | wc -l)" -eq 6
           (cd assets && sha256sum * > CHECKSUMS.txt && cat CHECKSUMS.txt)
