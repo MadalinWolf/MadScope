@@ -1,7 +1,7 @@
 # Release: builds genuine MadScope desktop installers on GitHub-hosted runners
 # and publishes them to a GitHub Release. Triggered by pushing a version tag:
 #
-#   git tag v1.0.0 && git push origin v1.0.0
+#   git tag v1.0.1 && git push origin v1.0.1
 #
 # Artifacts are renamed to canonical names (see RELEASE_NOTES.md) and the
 # release body comes from RELEASE_NOTES.md with CHECKSUMS.txt attached.

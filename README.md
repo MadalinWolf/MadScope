@@ -11,16 +11,16 @@ MadScope renders any URL in real Chromium across multiple viewport sizes, captur
 
 ## Download MadScope
 
-Latest release: [v1.0.0](https://github.com/MadalinWolf/MadScope/releases/tag/v1.0.1) · [all downloads](https://github.com/MadalinWolf/MadScope/releases)
+Latest release: [v1.0.1](https://github.com/MadalinWolf/MadScope/releases/tag/v1.0.1) · [all downloads](https://github.com/MadalinWolf/MadScope/releases)
 
 | Platform                    | Download                                                                                                                                      |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| Windows x64 (MSI installer) | [MadScope-1.0.1-windows-x64.msi](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.1/MadScope-1.0.0-windows-x64.msi)             |
-| Windows x64 (setup wizard)  | [MadScope-1.0.1-windows-x64-setup.exe](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.1/MadScope-1.0.0-windows-x64-setup.exe) |
-| macOS Apple Silicon         | [MadScope-1.0.1-macos-arm64.dmg](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.1/MadScope-1.0.0-macos-arm64.dmg)             |
-| macOS Intel                 | [MadScope-1.0.1-macos-x64.dmg](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.1/MadScope-1.0.0-macos-x64.dmg)                 |
-| Linux x64 (portable)        | [MadScope-1.0.1-linux-x64.AppImage](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.1/MadScope-1.0.0-linux-x64.AppImage)       |
-| Linux x64 (Debian/Ubuntu)   | [MadScope-1.0.1-linux-x64.deb](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.1/MadScope-1.0.0-linux-x64.deb)                 |
+| Windows x64 (MSI installer) | [MadScope-1.0.1-windows-x64.msi](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.1/MadScope-1.0.1-windows-x64.msi)             |
+| Windows x64 (setup wizard)  | [MadScope-1.0.1-windows-x64-setup.exe](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.1/MadScope-1.0.1-windows-x64-setup.exe) |
+| macOS Apple Silicon         | [MadScope-1.0.1-macos-arm64.dmg](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.1/MadScope-1.0.1-macos-arm64.dmg)             |
+| macOS Intel                 | [MadScope-1.0.1-macos-x64.dmg](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.1/MadScope-1.0.1-macos-x64.dmg)                 |
+| Linux x64 (portable)        | [MadScope-1.0.1-linux-x64.AppImage](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.1/MadScope-1.0.1-linux-x64.AppImage)       |
+| Linux x64 (Debian/Ubuntu)   | [MadScope-1.0.1-linux-x64.deb](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.1/MadScope-1.0.1-linux-x64.deb)                 |
 
 > macOS builds are unsigned: on first launch, right-click → **Open** → **Open**. Verify downloads against `CHECKSUMS.txt` on the release page.
 
@@ -266,9 +266,9 @@ Native installers are published via [GitHub Releases](https://github.com/Madalin
 
 ## Roadmap
 
-Done in v1.0.0: core engine, browser automation, screenshots + history, issue detection + score, comparison UI, baselines + regression, config, CLI, desktop installers, docs, tests.
+Done in v1.0.1: core engine, browser automation, screenshots + history, issue detection + score, comparison UI, baselines + regression, config, CLI, desktop installers, docs, tests.
 
-Next: GitHub Action with artifact upload, authenticated-session support (storage state/cookies with secret redaction), Firefox/WebKit engines, device presets, throttling, Tauri installers for Win/macOS/Linux. See [`docs/roadmap.md`](docs/roadmap.md).
+Next: authenticated-session support (storage state/cookies with secret redaction), Firefox/WebKit engines, device presets, throttling, GitHub Marketplace listing for the action. See [`docs/roadmap.md`](docs/roadmap.md).
 
 Experimental ideas (not implemented, architecture-ready): Lighthouse integration, accessibility checks, test recording, team/cloud features.
 

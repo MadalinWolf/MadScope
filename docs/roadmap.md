@@ -1,6 +1,6 @@
 # Roadmap
 
-## 1.0.0 (this release)
+## 1.0.1 (this release)
 
 Desktop installers (Windows/macOS/Linux, engine bundled), CLI `--json` output, version-sync tests, release automation.
 
@@ -8,9 +8,8 @@ Core engine, browser, screenshots+history, issue detection+score, ruler, compari
 
 ## Next
 
-- GitHub Action (`madscope/action`) with artifact upload + threshold fail — action YAML ships in `.github/workflows/` as a consumer example; marketplace publication after validation.
+- GitHub Marketplace listing for [`MadalinWolf/madscope-action`](https://github.com/MadalinWolf/madscope-action) — the action itself ships and self-tests in its own repo.
 - Auth support (Playwright storageState, cookies, custom headers) with secret redaction.
 - Firefox/WebKit engines, device presets, throttling, masking selectors.
-- Packaging: Tauri installers for Win/macOS/Linux (needs Rust CI).
 
 Out of scope for MVP: cloud sync, team features, test recording.
