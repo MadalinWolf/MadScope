@@ -108,7 +108,8 @@ jobs:
           test "$(stat -c%s "$APP")" -gt 40000000
           test "$(stat -c%s "$DEB")" -gt 40000000
           dpkg-deb --info "$DEB"
-          tmp=$(mktemp -d) && (cd "$tmp" && "$(pwd)/$APP" --appimage-extract >/dev/null) && ls "$tmp/squashfs-root/usr/bin"
+          ROOT="$PWD"
+          tmp=$(mktemp -d) && (cd "$tmp" && "$ROOT/$APP" --appimage-extract >/dev/null) && ls "$tmp/squashfs-root/usr/bin"
 
       - name: Upload raw bundles
         uses: actions/upload-artifact@v4
