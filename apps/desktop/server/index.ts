@@ -53,7 +53,7 @@ function toViewport(input: {
 }
 
 app.get("/api/health", (_req, res) => {
-  res.json({ ok: true, app: "MadScope", version: "1.0.0" });
+  res.json({ ok: true, app: "MadScope", version: "1.0.1" });
 });
 
 app.get("/api/presets", (_req, res) => {

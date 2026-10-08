@@ -25,7 +25,7 @@ program
   .description(
     "MadScope — local-first responsive testing and visual regression",
   )
-  .version("1.0.0");
+  .version("1.0.1");
 
 function resolveViewports(opts: {
   viewport?: string[];

@@ -1,6 +1,6 @@
 {
   "name": "@madscope/cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MadScope CLI: responsive testing and visual regression from the terminal",
   "license": "MIT",
   "type": "module",
@@ -14,13 +14,13 @@
     "dev": "tsx src/index.ts"
   },
   "dependencies": {
-    "@madscope/browser": "1.0.0",
-    "@madscope/config": "1.0.0",
-    "@madscope/core": "1.0.0",
-    "@madscope/shared": "1.0.0",
-    "@madscope/screenshots": "1.0.0",
-    "@madscope/visual-diff": "1.0.0",
-    "@madscope/issue-detector": "1.0.0",
+    "@madscope/browser": "1.0.1",
+    "@madscope/config": "1.0.1",
+    "@madscope/core": "1.0.1",
+    "@madscope/shared": "1.0.1",
+    "@madscope/screenshots": "1.0.1",
+    "@madscope/visual-diff": "1.0.1",
+    "@madscope/issue-detector": "1.0.1",
     "commander": "^12.1.0"
   },
   "devDependencies": {

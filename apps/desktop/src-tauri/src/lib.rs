@@ -21,8 +21,29 @@ struct EngineState {
     child: Mutex<Option<Child>>,
 }
 
+fn engine_candidates(app: &tauri::AppHandle) -> Vec<PathBuf> {
+    let mut out = Vec::new();
+    if let Ok(res) = app.path().resource_dir() {
+        out.push(res.join("engine"));
+        out.push(res.join("resources/engine"));
+    }
+    if let Ok(exe) = std::env::current_exe() {
+        if let Some(dir) = exe.parent() {
+            out.push(dir.join("engine"));
+            out.push(dir.join("resources/engine"));
+        }
+    }
+    out
+}
+
 fn engine_dir(app: &tauri::AppHandle) -> Option<PathBuf> {
-    app.path().resource_dir().ok().map(|d| d.join("engine"))
+    engine_candidates(app).into_iter().find(|d| {
+        #[cfg(windows)]
+        let node = d.join("node.exe");
+        #[cfg(not(windows))]
+        let node = d.join("node");
+        node.exists() && d.join("server.cjs").exists()
+    })
 }
 
 fn node_bin(engine: &PathBuf) -> PathBuf {
