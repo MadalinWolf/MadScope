@@ -1,5 +1,0 @@
-fix: add missing Tauri build script
-
-tauri::generate_context! requires the tauri-build build dependency
-to run via src-tauri/build.rs. Without it every platform fails with
-"OUT_DIR env var is not set".
