@@ -1,0 +1,32 @@
+{
+  "name": "@madscope/browser",
+  "version": "0.1.0",
+  "description": "Reusable Playwright browser engine for MadScope",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@madscope/shared": "0.1.0",
+    "@madscope/config": "0.1.0",
+    "playwright": "^1.48.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "rimraf": "^6.0.1"
+  }
+}

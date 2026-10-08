@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Overflow page</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui;
+      }
+      .wide {
+        width: 1200px;
+        background: #fee;
+        padding: 16px;
+      }
+      img.huge {
+        width: 1200px;
+        max-width: none;
+      }
+      .clip {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 200px;
+      }
+      .tiny {
+        font-size: 10px;
+        padding: 0;
+        margin: 0;
+        width: 10px;
+        height: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Overflow page</h1>
+      <div class="wide">
+        This div is 1200px wide and will overflow small viewports.
+      </div>
+      <img
+        class="huge"
+        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='100'%3E%3Crect width='1200' height='100' fill='%23ccc'/%3E%3C/svg%3E"
+        alt="wide"
+      />
+      <p class="clip">
+        This is a very long line of text that should be clipped with ellipsis in
+        a 200px box and detected.
+      </p>
+      <button class="tiny">x</button>
+    </main>
+  </body>
+</html>

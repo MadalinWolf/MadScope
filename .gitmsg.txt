@@ -1,0 +1,6 @@
+feat: initialize MadScope foundation
+
+Local-first responsive testing and visual regression tool:
+core engine, Playwright browser package, screenshots, visual diff,
+issue detection with health score, CLI, desktop UI with Tauri scaffold,
+config system, fixtures, unit and integration tests, docs.

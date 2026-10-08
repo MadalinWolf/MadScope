@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Responsive page</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui;
+      }
+      main {
+        padding: 24px;
+      }
+      .grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: 1fr;
+      }
+      @media (min-width: 768px) {
+        .grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      @media (min-width: 1280px) {
+        .grid {
+          grid-template-columns: 1fr 1fr 1fr;
+        }
+      }
+      .card {
+        border: 1px solid #ccc;
+        padding: 16px;
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Responsive page</h1>
+      <div class="grid">
+        <div class="card">A</div>
+        <div class="card">B</div>
+        <div class="card">C</div>
+      </div>
+    </main>
+  </body>
+</html>

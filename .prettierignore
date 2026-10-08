@@ -1,0 +1,7 @@
+node_modules
+**/dist
+**/server-dist
+.madscope
+verify-tmp
+coverage
+apps/desktop/dist

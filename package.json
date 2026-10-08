@@ -1,0 +1,38 @@
+{
+  "name": "madscope",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MadScope is a local-first developer tool for responsive testing, screenshot comparison, and visual regression testing.",
+  "license": "MIT",
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=@madscope/desktop",
+    "dev:server": "npm run dev:server --workspace=@madscope/desktop",
+    "build": "npm run build --workspaces --if-present",
+    "build:packages": "tsc -b packages/shared packages/config packages/browser packages/screenshots packages/visual-diff packages/issue-detector packages/core",
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "lint": "eslint . --max-warnings=0",
+    "format": "prettier --check .",
+    "format:write": "prettier --write .",
+    "typecheck": "tsc -b && tsc --noEmit -p apps/desktop/tsconfig.json && tsc --noEmit -p apps/cli/tsconfig.json",
+    "playwright:install": "npx playwright install chromium --with-deps",
+    "cli": "node apps/cli/dist/index.js"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^2.1.3",
+    "eslint": "^9.12.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.71.1",
+    "vitest": "^2.1.3"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  }
+}
