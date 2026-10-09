@@ -11,16 +11,16 @@ MadScope renders any URL in real Chromium across multiple viewport sizes, captur
 
 ## Download MadScope
 
-Latest release: [v1.0.1](https://github.com/MadalinWolf/MadScope/releases/tag/v1.0.1) · [all downloads](https://github.com/MadalinWolf/MadScope/releases)
+Latest release: [v1.1.0](https://github.com/MadalinWolf/MadScope/releases/tag/v1.1.0) · [all downloads](https://github.com/MadalinWolf/MadScope/releases)
 
 | Platform                    | Download                                                                                                                                      |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| Windows x64 (MSI installer) | [MadScope-1.0.1-windows-x64.msi](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.1/MadScope-1.0.1-windows-x64.msi)             |
-| Windows x64 (setup wizard)  | [MadScope-1.0.1-windows-x64-setup.exe](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.1/MadScope-1.0.1-windows-x64-setup.exe) |
-| macOS Apple Silicon         | [MadScope-1.0.1-macos-arm64.dmg](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.1/MadScope-1.0.1-macos-arm64.dmg)             |
-| macOS Intel                 | [MadScope-1.0.1-macos-x64.dmg](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.1/MadScope-1.0.1-macos-x64.dmg)                 |
-| Linux x64 (portable)        | [MadScope-1.0.1-linux-x64.AppImage](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.1/MadScope-1.0.1-linux-x64.AppImage)       |
-| Linux x64 (Debian/Ubuntu)   | [MadScope-1.0.1-linux-x64.deb](https://github.com/MadalinWolf/MadScope/releases/download/v1.0.1/MadScope-1.0.1-linux-x64.deb)                 |
+| Windows x64 (MSI installer) | [MadScope-1.1.0-windows-x64.msi](https://github.com/MadalinWolf/MadScope/releases/download/v1.1.0/MadScope-1.1.0-windows-x64.msi)             |
+| Windows x64 (setup wizard)  | [MadScope-1.1.0-windows-x64-setup.exe](https://github.com/MadalinWolf/MadScope/releases/download/v1.1.0/MadScope-1.1.0-windows-x64-setup.exe) |
+| macOS Apple Silicon         | [MadScope-1.1.0-macos-arm64.dmg](https://github.com/MadalinWolf/MadScope/releases/download/v1.1.0/MadScope-1.1.0-macos-arm64.dmg)             |
+| macOS Intel                 | [MadScope-1.1.0-macos-x64.dmg](https://github.com/MadalinWolf/MadScope/releases/download/v1.1.0/MadScope-1.1.0-macos-x64.dmg)                 |
+| Linux x64 (portable)        | [MadScope-1.1.0-linux-x64.AppImage](https://github.com/MadalinWolf/MadScope/releases/download/v1.1.0/MadScope-1.1.0-linux-x64.AppImage)       |
+| Linux x64 (Debian/Ubuntu)   | [MadScope-1.1.0-linux-x64.deb](https://github.com/MadalinWolf/MadScope/releases/download/v1.1.0/MadScope-1.1.0-linux-x64.deb)                 |
 
 > macOS builds are unsigned: on first launch, right-click → **Open** → **Open**. Verify downloads against `CHECKSUMS.txt` on the release page.
 
@@ -334,7 +334,7 @@ npx tauri dev     # needs Rust toolchain
 npx tauri build   # needs Rust toolchain
 ```
 
-Native installers are published via [GitHub Releases](https://github.com/MadalinWolf/MadScope/releases) (see Download below). The Tauri bundle embeds the full engine — portable Node, the render server and Chromium — so the app works offline after install with no extra setup. To build the installers yourself you need a Rust toolchain and platform WebView dependencies; `git tag v1.0.1 && git push origin v1.0.1` builds them on GitHub Actions (see [`.github/workflows/release.yml`](.github/workflows/release.yml)).
+Native installers are published via [GitHub Releases](https://github.com/MadalinWolf/MadScope/releases) (see Download below). The Tauri bundle embeds the full engine — portable Node, the render server and Chromium — so the app works offline after install with no extra setup. To build the installers yourself you need a Rust toolchain and platform WebView dependencies; `git tag v1.1.0 && git push origin v1.1.0` builds them on GitHub Actions (see [`.github/workflows/release.yml`](.github/workflows/release.yml)).
 
 ## Roadmap
 
