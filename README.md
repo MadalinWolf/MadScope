@@ -346,6 +346,10 @@ Next: authenticated-session support (storage state/cookies with secret redaction
 
 Experimental ideas (not implemented, architecture-ready): Lighthouse integration, accessibility checks, test recording, team/cloud features.
 
+> **🚧 Roadmap in progress**
+>
+> MadScope is actively evolving, with improvements and new capabilities planned to make responsive testing and visual regression workflows even more powerful. Stay tuned for future updates!
+
 ## Contributing
 
 MadScope is MIT-licensed and open to contributions. Start with [`CONTRIBUTING.md`](CONTRIBUTING.md): keep the core UI-agnostic, never add fake functionality, never log secrets, add tests for new behavior.
@@ -353,5 +357,4 @@ MadScope is MIT-licensed and open to contributions. Start with [`CONTRIBUTING.md
 Security issues: see [`SECURITY.md`](SECURITY.md) — please report privately, not via public issues.
 
 ## License
-
 [MIT](LICENSE) — free for commercial and personal use.
