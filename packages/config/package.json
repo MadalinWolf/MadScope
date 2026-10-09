@@ -1,6 +1,6 @@
 {
   "name": "@madscope/config",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Type-safe configuration system for MadScope",
   "license": "MIT",
   "type": "module",
@@ -21,7 +21,7 @@
     "clean": "rimraf dist *.tsbuildinfo"
   },
   "dependencies": {
-    "@madscope/shared": "1.0.1"
+    "@madscope/shared": "1.1.0"
   },
   "devDependencies": {
     "typescript": "^5.5.4",

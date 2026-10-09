@@ -4,15 +4,18 @@ What was run for the v1.1.0 feature update (three themes + selectable/copyable
 diagnostics + AI-ready report), what passed, and what was not tested. Results
 below are from the actual runs, not aspirations.
 
+Feature commit: [`291f009`](https://github.com/MadalinWolf/MadScope/commit/291f00951a42b2aff72c3892e9802e9d2e3f9779)
+CI run: [#37984646506](https://github.com/MadalinWolf/MadScope/actions/runs/37984646506)
+
 ## Automated checks (local, Windows, Node 24)
 
-| Check               | Command            | Result                                       |
-| ------------------- | ------------------ | -------------------------------------------- |
-| Formatting          | `npm run format`   | ✅ pass (prettier)                           |
-| Lint                | `npm run lint`     | ✅ pass (eslint)                             |
-| Typecheck           | `npm run typecheck`| ✅ pass (tsc project references)             |
-| Production build    | `npm run build`    | ✅ pass (Vite desktop bundle, all 3 theme blocks present in `dist/`) |
-| Unit + integration  | `npm test`         | ✅ **57/57 passed** (11 files; 53 unit + 4 integration) |
+| Check              | Command             | Result                                                               |
+| ------------------ | ------------------- | -------------------------------------------------------------------- |
+| Formatting         | `npm run format`    | ✅ pass (prettier)                                                   |
+| Lint               | `npm run lint`      | ✅ pass (eslint)                                                     |
+| Typecheck          | `npm run typecheck` | ✅ pass (tsc project references)                                     |
+| Production build   | `npm run build`     | ✅ pass (Vite desktop bundle, all 3 theme blocks present in `dist/`) |
+| Unit + integration | `npm test`          | ✅ **57/57 passed** (11 files; 53 unit + 4 integration)              |
 
 New unit tests added for this release:
 
@@ -68,13 +71,13 @@ Validated in Chromium against the dev build with the canonical MadScope page
 Genuine captures of the running app inspecting the live URL (Playwright,
 project's own stack), 1440×900, stored in `docs/images/`:
 
-| File                             | Shows                                          |
-| -------------------------------- | ---------------------------------------------- |
-| `madscope-existing-theme.png`    | Existing theme (default)                       |
-| `madscope-terminal-theme.png`    | Terminal theme                                 |
-| `madscope-light-theme.png`       | Light theme                                    |
-| `madscope-mobile-diagnostics.png`| Mobile inspection results with real diagnostics |
-| `madscope-copy-report.png`       | Copy controls + AI-report status feedback      |
+| File                              | Shows                                           |
+| --------------------------------- | ----------------------------------------------- |
+| `madscope-existing-theme.png`     | Existing theme (default)                        |
+| `madscope-terminal-theme.png`     | Terminal theme                                  |
+| `madscope-light-theme.png`        | Light theme                                     |
+| `madscope-mobile-diagnostics.png` | Mobile inspection results with real diagnostics |
+| `madscope-copy-report.png`        | Copy controls + AI-report status feedback       |
 
 ## Not tested / known limits
 

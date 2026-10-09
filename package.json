@@ -1,6 +1,6 @@
 {
   "name": "madscope",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "private": true,
   "description": "MadScope is a local-first developer tool for responsive testing, screenshot comparison, and visual regression testing.",
   "license": "MIT",

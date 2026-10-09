@@ -1,6 +1,6 @@
 {
   "name": "@madscope/shared",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Shared types, viewport presets, URL validation for MadScope",
   "license": "MIT",
   "type": "module",
