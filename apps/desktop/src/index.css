@@ -2,15 +2,116 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+/* ---------------------------------------------------------------------------
+   Themes — exactly three: Existing (default), Terminal, Light.
+   Selected theme is the `data-theme` attribute on <html> (see src/lib/themes.ts
+   and the small bootstrap script in index.html). Colors are RGB triplets wired
+   into Tailwind via tailwind.config.js as `rgb(var(--c-*) / <alpha-value>)`,
+   so every utility (including alpha variants) honours the active theme.
+--------------------------------------------------------------------------- */
+
+:root,
+[data-theme="existing"] {
   color-scheme: dark;
+  /* Existing theme — byte-for-byte the original MadScope palette. */
+  --c-app: 10 10 10; /* neutral-950 */
+  --c-panel: 23 23 23; /* neutral-900 */
+  --c-inset: 10 10 10; /* neutral-950 */
+  --c-edge: 38 38 38; /* neutral-800 */
+  --c-edge-strong: 64 64 64; /* neutral-700 */
+  --c-ink: 245 245 245; /* neutral-100 */
+  --c-ink-soft: 212 212 212; /* neutral-300 */
+  --c-ink-muted: 163 163 163; /* neutral-400 */
+  --c-ink-dim: 115 115 115; /* neutral-500 */
+  --c-accent: 14 165 233; /* sky-500 */
+  --c-accent-ink: 10 10 10; /* neutral-950 */
+  --c-danger: 248 113 113; /* red-400 */
+  --c-ok-bg: 6 78 59; /* emerald-900 */
+  --c-ok-ink: 167 243 208; /* emerald-200 */
+  --c-warn-bg: 69 26 3; /* amber-900 */
+  --c-warn-ink: 253 230 138; /* amber-200 */
+  --c-warn-strong: 252 211 77; /* amber-300 */
+  --c-rule: 7 89 133; /* sky-800 */
+  --c-focus: 56 189 248; /* sky-400 */
+  --c-panel-shadow: 0 0 #0000;
+  --font-tech:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+}
+
+[data-theme="terminal"] {
+  color-scheme: dark;
+  /* Near-black green-tinted charcoal, terminal-green accents, mono for
+     technical elements. Success = green, warning = amber, error = red. */
+  --c-app: 8 12 8;
+  --c-panel: 15 20 15;
+  --c-inset: 5 8 5;
+  --c-edge: 34 48 34;
+  --c-edge-strong: 55 78 55;
+  --c-ink: 204 235 204;
+  --c-ink-soft: 168 200 168;
+  --c-ink-muted: 125 155 125;
+  --c-ink-dim: 110 138 110;
+  --c-accent: 63 241 95;
+  --c-accent-ink: 5 20 8;
+  --c-danger: 255 105 105;
+  --c-ok-bg: 12 52 22;
+  --c-ok-ink: 143 255 171;
+  --c-warn-bg: 60 45 5;
+  --c-warn-ink: 255 220 100;
+  --c-warn-strong: 255 214 90;
+  --c-rule: 40 90 50;
+  --c-focus: 63 241 95;
+  --c-panel-shadow: 0 0 #0000;
+  --font-tech:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
+    monospace;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  /* Bright, clean surfaces; dark readable text; subtle borders and a
+     restrained shadow on panels. */
+  --c-app: 243 244 246;
+  --c-panel: 255 255 255;
+  --c-inset: 249 250 251;
+  --c-edge: 229 231 235;
+  --c-edge-strong: 203 213 225;
+  --c-ink: 17 24 39;
+  --c-ink-soft: 55 65 81;
+  --c-ink-muted: 75 85 99;
+  --c-ink-dim: 87 97 112;
+  --c-accent: 2 132 199;
+  --c-accent-ink: 255 255 255;
+  --c-danger: 185 28 28;
+  --c-ok-bg: 220 252 231;
+  --c-ok-ink: 6 95 70;
+  --c-warn-bg: 254 243 199;
+  --c-warn-ink: 133 77 14;
+  --c-warn-strong: 161 98 7;
+  --c-rule: 186 230 253;
+  --c-focus: 2 132 199;
+  --c-panel-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
+  --font-tech:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
 }
 
 body {
-  @apply bg-neutral-950 text-neutral-100 antialiased;
+  @apply bg-app text-ink antialiased;
 }
 
 :focus-visible {
-  outline: 2px solid #38bdf8;
+  outline: 2px solid rgb(var(--c-focus));
   outline-offset: 2px;
+}
+
+/* Restrained per-theme shadow for panels (only Light opts in visually). */
+.panel-shadow {
+  box-shadow: var(--c-panel-shadow);
+}
+
+/* Monospace for technical elements: URLs, dimensions, diagnostics, reports. */
+.font-tech {
+  font-family: var(--font-tech);
 }

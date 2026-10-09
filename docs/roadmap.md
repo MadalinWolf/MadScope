@@ -1,6 +1,10 @@
 # Roadmap
 
-## 1.0.1 (this release)
+## 1.1.0 (this release)
+
+Three selectable themes (Existing, Terminal, Light) with instant switching and persistence, selectable/copyable diagnostics with copy-all, copy-selected and an AI-ready inspection report for sharing findings with a coding agent.
+
+## 1.0.1
 
 Desktop installers (Windows/macOS/Linux, engine bundled), CLI `--json` output, version-sync tests, release automation.
 

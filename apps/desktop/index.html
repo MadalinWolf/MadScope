@@ -4,6 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MadScope — Responsive testing</title>
+    <script>
+      // Apply the persisted theme before first paint to avoid a flash of the
+      // default theme. Mirrors THEME_IDS in src/lib/themes.ts.
+      (function () {
+        try {
+          var t = localStorage.getItem("madscope-theme");
+          if (t === "existing" || t === "terminal" || t === "light") {
+            document.documentElement.setAttribute("data-theme", t);
+          }
+        } catch (_) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

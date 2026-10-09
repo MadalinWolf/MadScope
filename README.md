@@ -62,6 +62,52 @@ Seven detectors, every finding worded as a _potential_ issue with type, severity
 
 ![MadScope issue detection — potential responsive problems with severity](docs/images/madscope-issues.png)
 
+### Sharing diagnostics with an AI agent
+
+Diagnostic text in the results is plain, selectable content — never `user-select: none`, never tooltip-only — and each viewport card lists **all** of its findings (no truncation). Copy controls:
+
+- **Copy** (on each finding) — copies that one diagnostic with its type, severity, message, viewport, selector and evidence.
+- **Copy all errors (N)** — prominent action in the results header; copies every diagnostic of the inspection, numbered in report order.
+- **Copy selected (N)** — tick the checkbox next to the findings you care about and copy just those together.
+- **Copy AI report** — copies the structured plain-text report for the whole inspection.
+
+Every copy reports success only after the clipboard operation actually succeeded (async Clipboard API first, hidden-textarea `execCommand` fallback second) and shows the real failure message when it did not. Diagnostic messages and selectors wrap instead of overflowing, and keyboard users can reach every copy action with Tab.
+
+The report uses only fields the engine actually knows:
+
+```text
+MADSCOPE WEBSITE INSPECTION REPORT
+
+Inspected URL: https://madwolfstudios.com/projects/madscope/
+Viewport: 390 × 844
+Device/profile: mobile
+Timestamp: 2026-10-09T14:03:11.284Z
+Health score: 92 / 100
+Diagnostics source: MadScope responsive issue detector (layout diagnostics)
+
+SUMMARY
+Total reported diagnostics: 3
+
+ERRORS
+
+[1] Type: horizontal-overflow
+Severity: high
+Message: Document scrolls horizontally: 412px content in 390px viewport.
+Viewport: Mobile 390×844
+Selector: .page
+Evidence: scrollWidth=412 viewportWidth=390
+
+[2] Type: small-touch-target
+Severity: low
+…
+
+END OF REPORT
+```
+
+Paste it directly into OpenCode or another AI coding agent — for example: *"Fix the diagnostics in this MadScope report for my mobile viewport."* — and the agent gets the exact URL, viewport dimensions, per-finding severity/selector/evidence, and a summary count that matches the entries. The report is still useful at zero diagnostics ("Total reported diagnostics: 0").
+
+**Scope and honesty:** MadScope's engine detects the seven responsive *layout* diagnostics above. It does not collect JavaScript exceptions, failed network requests or accessibility audits, so the report states `Diagnostics source: MadScope responsive issue detector (layout diagnostics)` instead of inventing categories, and it never emits a browser/runtime line it cannot know. Diagnostics of the inspected site are kept separate from MadScope's own engine errors (those appear as the red alert under the URL field and are not part of the report).
+
 ### Responsive Health score
 
 A transparent 0–100 score: start at 100, subtract fixed per-type penalties (e.g. horizontal overflow −15, element overflow −4 each capped at −20). Same page, same score — every time. Formula: [`docs/scoring.md`](docs/scoring.md).
@@ -106,7 +152,19 @@ Options: `--viewport`, `--width`/`--height`, `--device mobile`, `--full-page`, `
 
 ### Desktop application
 
-React + Tailwind UI (also wrapped as a Tauri desktop app): URL bar with validation, viewport picker, live results with health score, baseline/test actions, comparison views, keyboard shortcuts (`R` re-run, `S` screenshot, `B` baseline, `T` test, `Esc` close).
+React + Tailwind UI (also wrapped as a Tauri desktop app): URL bar with validation, viewport picker, theme selector, live results with health score, diagnostic copy controls, baseline/test actions, comparison views, keyboard shortcuts (`R` re-run, `S` screenshot, `B` baseline, `T` test, `Esc` close).
+
+### Themes
+
+A **Theme** selector in the header offers exactly three choices:
+
+| Theme    | Look                                                                                                                             |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Existing | The original MadScope dark design — the default, unchanged for existing users                                                    |
+| Terminal | Near-black green-tinted charcoal, terminal-green accents, monospaced type for technical elements (URLs, dimensions, diagnostics, reports), clearly distinct success/warning/error colors |
+| Light    | Bright white surfaces, dark readable text, subtle borders, restrained shadow on panels, accessible error/warning/success colors   |
+
+Switching is instant (no reload) and persists in `localStorage` under `madscope-theme`, so it survives refreshes and later visits. Every color comes from CSS custom properties, so navigation, viewport cards, error lists, buttons, modals and reports all follow the selected theme; there is no hardcoded color that can ignore it.
 
 ### Local-first architecture
 
@@ -237,6 +295,16 @@ All screenshots below are real MadScope output (deterministic local fixtures, no
 | --------------------------------------------------------------- |
 | ![MadScope visual comparison](docs/images/madscope-compare.png) |
 
+| Existing theme                                               | Terminal theme                                              | Light theme                                           |
+| ------------------------------------------------------------ | ----------------------------------------------------------- | ----------------------------------------------------- |
+| ![MadScope existing theme](docs/images/madscope-existing-theme.png) | ![MadScope terminal theme](docs/images/madscope-terminal-theme.png) | ![MadScope light theme](docs/images/madscope-light-theme.png) |
+
+| Mobile viewport inspection with real diagnostics                | Copy controls + AI-report feedback                             |
+| --------------------------------------------------------------- | --------------------------------------------------------------- |
+| ![MadScope mobile diagnostics](docs/images/madscope-mobile-diagnostics.png) | ![MadScope copy report](docs/images/madscope-copy-report.png) |
+
+The theme and diagnostics screenshots are real captures of the running app inspecting this project's live MadScope page (`https://madwolfstudios.com/projects/madscope/`).
+
 ## Development
 
 ```bash
@@ -252,6 +320,10 @@ npm run format           # prettier check
 npm run typecheck        # tsc project references + apps
 ```
 
+Unit tests cover the report formatter (field honesty, entry/summary counts, zero-diagnostic case), the theme set and persistence, and clipboard success/fallback/failure behavior; integration tests exercise the CLI and real Chromium rendering.
+
+CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs `typecheck`, `lint`, the full test suite and a production build on every push; release installers are built from version tags ([`release.yml`](.github/workflows/release.yml)). Which checks ran, what passed, and what could not be tested for this release: [`docs/verification.md`](docs/verification.md).
+
 ### Desktop (Tauri)
 
 The UI in `apps/desktop/src` runs in Vite during development. The Tauri shell in `apps/desktop/src-tauri` wraps the same `dist/` output:
@@ -265,6 +337,8 @@ npx tauri build   # needs Rust toolchain
 Native installers are published via [GitHub Releases](https://github.com/MadalinWolf/MadScope/releases) (see Download below). The Tauri bundle embeds the full engine — portable Node, the render server and Chromium — so the app works offline after install with no extra setup. To build the installers yourself you need a Rust toolchain and platform WebView dependencies; `git tag v1.0.1 && git push origin v1.0.1` builds them on GitHub Actions (see [`.github/workflows/release.yml`](.github/workflows/release.yml)).
 
 ## Roadmap
+
+Done in v1.1.0: three themes (Existing/Terminal/Light) with persistence, selectable diagnostics with copy-all/copy-selected and an AI-ready inspection report.
 
 Done in v1.0.1: core engine, browser automation, screenshots + history, issue detection + score, comparison UI, baselines + regression, config, CLI, desktop installers, docs, tests.
 

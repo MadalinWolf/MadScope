@@ -1,5 +1,21 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { validateUrl, VIEWPORT_PRESETS } from "@madscope/shared";
+import { getPresetById, validateUrl, VIEWPORT_PRESETS } from "@madscope/shared";
+import {
+  applyTheme,
+  isThemeId,
+  loadTheme,
+  saveTheme,
+  THEME_IDS,
+  THEME_LABELS,
+  type ThemeId,
+} from "./lib/themes";
+import {
+  buildInspectionReport,
+  formatIssue,
+  formatIssueEntries,
+  type ReportIssue,
+} from "./lib/report";
+import { copyText } from "./lib/clipboard";
 
 type ApiViewport = { id: string; name: string; width: number; height: number };
 type ScanIssue = {
@@ -23,6 +39,8 @@ type ScanResponse = {
   results: ScanItem[];
   health: { score: number; maxScore: number };
 };
+type CopyStatus = { kind: "ok" | "error" | "info"; message: string };
+type FlatDiagnostic = { key: string; issue: ReportIssue };
 
 const DEFAULT_SELECTED = ["mobile", "tablet", "desktop"];
 
@@ -49,6 +67,11 @@ async function api<T>(path: string, body?: unknown): Promise<T> {
   return data;
 }
 
+/** Preset category for a viewport ("mobile"/"tablet"/"desktop"), else "custom". */
+function profileForViewport(vp: ApiViewport): string {
+  return getPresetById(vp.id)?.category ?? "custom";
+}
+
 export default function App() {
   const [url, setUrl] = useState("https://example.com");
   const [selected, setSelected] = useState<string[]>(DEFAULT_SELECTED);
@@ -65,6 +88,12 @@ export default function App() {
   const [slider, setSlider] = useState(50);
   const [testReport, setTestReport] = useState<string | null>(null);
   const [engineReady, setEngineReady] = useState(false);
+  const [theme, setTheme] = useState<ThemeId>(() => loadTheme());
+  const [selectedIssues, setSelectedIssues] = useState<Set<string>>(new Set());
+  const [copyStatus, setCopyStatus] = useState<CopyStatus | null>(null);
+  const [rowStatus, setRowStatus] = useState<
+    (CopyStatus & { key: string }) | null
+  >(null);
 
   // The bundled engine can take a few seconds to start with the app.
   useEffect(() => {
@@ -87,6 +116,12 @@ export default function App() {
       cancelled = true;
     };
   }, []);
+
+  // Theme applies immediately (data-theme on <html>) and persists.
+  useEffect(() => {
+    applyTheme(theme);
+    saveTheme(theme);
+  }, [theme]);
 
   const allViewports: ApiViewport[] = useMemo(
     () => [
@@ -155,6 +190,9 @@ export default function App() {
         viewports: payload,
       });
       setScan(data);
+      setSelectedIssues(new Set());
+      setCopyStatus(null);
+      setRowStatus(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -214,13 +252,113 @@ export default function App() {
     }
   }, [scan]);
 
+  // Every diagnostic of the current inspection, in report order, with a key
+  // stable for this scan (viewport id + index). Never truncated: copying must
+  // not silently omit diagnostics that the UI chose not to render.
+  const flattened: FlatDiagnostic[] = useMemo(
+    () =>
+      scan
+        ? scan.results.flatMap((r) =>
+            r.issues.map((issue, idx) => ({
+              key: `${r.viewport.id}#${idx}`,
+              issue,
+            })),
+          )
+        : [],
+    [scan],
+  );
+  const totalDiagnostics = flattened.length;
+
+  const reportText = useMemo(
+    () =>
+      scan
+        ? buildInspectionReport({
+            url: scan.url,
+            health: scan.health,
+            viewports: scan.results.map((r) => ({
+              name: r.viewport.name,
+              width: r.viewport.width,
+              height: r.viewport.height,
+              profile: profileForViewport(r.viewport),
+              timestamp: r.screenshot?.timestamp,
+              issues: r.issues,
+            })),
+          })
+        : "",
+    [scan],
+  );
+
+  // Reports success only after the clipboard operation actually resolved.
+  const copyWithFeedback = useCallback(
+    async (text: string, successMessage: string) => {
+      setRowStatus(null);
+      const result = await copyText(text);
+      setCopyStatus(
+        result.ok
+          ? { kind: "ok", message: successMessage }
+          : { kind: "error", message: `Copy failed — ${result.error}` },
+      );
+    },
+    [],
+  );
+
+  const copyAllErrors = useCallback(() => {
+    if (totalDiagnostics === 0) {
+      setRowStatus(null);
+      setCopyStatus({
+        kind: "info",
+        message: "Nothing to copy — this inspection reported no diagnostics.",
+      });
+      return;
+    }
+    const text = formatIssueEntries(flattened.map((f) => f.issue));
+    const label = totalDiagnostics === 1 ? "diagnostic" : "diagnostics";
+    void copyWithFeedback(text, `Copied ${totalDiagnostics} ${label}.`);
+  }, [flattened, totalDiagnostics, copyWithFeedback]);
+
+  const copySelectedErrors = useCallback(() => {
+    const chosen = flattened.filter((f) => selectedIssues.has(f.key));
+    if (chosen.length === 0) return;
+    const text = formatIssueEntries(chosen.map((f) => f.issue));
+    const label = chosen.length === 1 ? "diagnostic" : "diagnostics";
+    void copyWithFeedback(text, `Copied ${chosen.length} selected ${label}.`);
+  }, [flattened, selectedIssues, copyWithFeedback]);
+
+  const copyReport = useCallback(() => {
+    void copyWithFeedback(reportText, "Copied the AI-ready inspection report.");
+  }, [reportText, copyWithFeedback]);
+
+  const copyOne = useCallback(async (key: string, issue: ReportIssue) => {
+    setCopyStatus(null);
+    const result = await copyText(formatIssue(issue));
+    if (result.ok) {
+      setRowStatus({ key, kind: "ok", message: "Copied" });
+      setCopyStatus({ kind: "ok", message: "Copied 1 diagnostic." });
+    } else {
+      setRowStatus({ key, kind: "error", message: "Copy failed" });
+      setCopyStatus({
+        kind: "error",
+        message: `Copy failed — ${result.error}`,
+      });
+    }
+  }, []);
+
+  const toggleIssue = useCallback((key: string) => {
+    setSelectedIssues((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }, []);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setCompare(null);
       }
       const tag = (document.activeElement?.tagName ?? "").toLowerCase();
-      if (tag === "input" || tag === "textarea") return;
+      if (tag === "input" || tag === "textarea" || tag === "select") return;
       if (e.key === "r" || e.key === "R") void runScan();
       if (e.key === "s" || e.key === "S") void runScan();
       if (e.key === "b" || e.key === "B") void runBaseline();
@@ -230,24 +368,53 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [runScan, runBaseline, runTest]);
 
+  const statusClass =
+    copyStatus?.kind === "ok"
+      ? "text-sm text-ok-ink"
+      : copyStatus?.kind === "error"
+        ? "text-sm text-danger"
+        : "text-sm text-ink-muted";
+
   return (
     <div className="min-h-screen">
-      <header className="border-b border-neutral-800 bg-neutral-900/60">
-        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
+      <header className="border-b border-edge bg-panel/60">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-3">
           <div
-            className="flex h-8 w-8 items-center justify-center rounded bg-sky-500 font-bold text-neutral-950"
+            className="flex h-8 w-8 items-center justify-center rounded bg-accent font-bold text-accent-ink"
             aria-hidden="true"
           >
             M
           </div>
           <div>
             <h1 className="text-base font-semibold leading-tight">MadScope</h1>
-            <p className="text-xs text-neutral-400">
+            <p className="text-xs text-ink-muted">
               Local-first responsive testing
             </p>
           </div>
-          <div className="ml-auto text-xs text-neutral-400">
-            No account · No telemetry · Screenshots stay local
+          <div className="ml-auto flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2">
+              <label htmlFor="theme-select" className="text-xs text-ink-muted">
+                Theme
+              </label>
+              <select
+                id="theme-select"
+                value={theme}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  if (isThemeId(next)) setTheme(next);
+                }}
+                className="rounded border border-edge-strong bg-inset px-2 py-1 text-xs text-ink"
+              >
+                {THEME_IDS.map((id) => (
+                  <option key={id} value={id}>
+                    {THEME_LABELS[id]}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="text-xs text-ink-muted">
+              No account · No telemetry · Screenshots stay local
+            </div>
           </div>
         </div>
       </header>
@@ -255,7 +422,7 @@ export default function App() {
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-6">
         <section
           aria-label="URL and viewports"
-          className="rounded border border-neutral-800 bg-neutral-900 p-4"
+          className="panel-shadow rounded border border-edge bg-panel p-4"
         >
           <form
             onSubmit={(e) => {
@@ -276,26 +443,26 @@ export default function App() {
                 placeholder="https://example.com"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                className="flex-1 rounded border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm"
+                className="font-tech flex-1 rounded border border-edge-strong bg-inset px-3 py-2 text-sm"
                 aria-invalid={error ? true : undefined}
                 aria-describedby={error ? "url-error" : undefined}
               />
               <button
                 type="submit"
                 disabled={loading || !engineReady}
-                className="rounded bg-sky-500 px-4 py-2 text-sm font-semibold text-neutral-950 disabled:opacity-50"
+                className="rounded bg-accent px-4 py-2 text-sm font-semibold text-accent-ink disabled:opacity-50"
               >
                 {loading ? "Rendering…" : "Render (R)"}
               </button>
             </div>
             {!engineReady && (
-              <p role="status" className="text-sm text-neutral-400">
+              <p role="status" className="text-sm text-ink-muted">
                 Starting the local engine… this takes a few seconds on first
                 launch.
               </p>
             )}
             {error && (
-              <p id="url-error" role="alert" className="text-sm text-red-400">
+              <p id="url-error" role="alert" className="text-sm text-danger">
                 {error}
               </p>
             )}
@@ -311,17 +478,17 @@ export default function App() {
               {allViewports.map((vp) => (
                 <label
                   key={vp.id}
-                  className="flex cursor-pointer items-center gap-2 rounded border border-neutral-800 bg-neutral-950 px-2 py-2 text-sm"
+                  className="flex cursor-pointer items-center gap-2 rounded border border-edge bg-inset px-2 py-2 text-sm"
                 >
                   <input
                     type="checkbox"
                     checked={selected.includes(vp.id)}
                     onChange={() => toggle(vp.id)}
-                    className="h-4 w-4 accent-sky-500"
+                    className="h-4 w-4 accent-accent"
                   />
                   <span>
                     <span className="block font-medium">{vp.name}</span>
-                    <span className="block text-xs text-neutral-400">
+                    <span className="font-tech block text-xs text-ink-muted">
                       {vp.width}×{vp.height}
                     </span>
                   </span>
@@ -330,33 +497,33 @@ export default function App() {
             </div>
             <div className="mt-3 flex flex-wrap items-end gap-2">
               <div>
-                <label htmlFor="cw" className="block text-xs text-neutral-400">
+                <label htmlFor="cw" className="block text-xs text-ink-muted">
                   Width
                 </label>
                 <input
                   id="cw"
                   value={customW}
                   onChange={(e) => setCustomW(e.target.value)}
-                  className="w-24 rounded border border-neutral-700 bg-neutral-950 px-2 py-1 text-sm"
+                  className="font-tech w-24 rounded border border-edge-strong bg-inset px-2 py-1 text-sm"
                   inputMode="numeric"
                 />
               </div>
               <div>
-                <label htmlFor="ch" className="block text-xs text-neutral-400">
+                <label htmlFor="ch" className="block text-xs text-ink-muted">
                   Height
                 </label>
                 <input
                   id="ch"
                   value={customH}
                   onChange={(e) => setCustomH(e.target.value)}
-                  className="w-24 rounded border border-neutral-700 bg-neutral-950 px-2 py-1 text-sm"
+                  className="font-tech w-24 rounded border border-edge-strong bg-inset px-2 py-1 text-sm"
                   inputMode="numeric"
                 />
               </div>
               <button
                 type="button"
                 onClick={addCustom}
-                className="rounded border border-neutral-700 px-3 py-1 text-sm"
+                className="rounded border border-edge-strong px-3 py-1 text-sm"
               >
                 Add custom
               </button>
@@ -366,32 +533,60 @@ export default function App() {
 
         {scan && (
           <section aria-label="Results" className="space-y-4">
-            <div className="flex flex-wrap items-center gap-3 rounded border border-neutral-800 bg-neutral-900 p-4">
+            <div className="panel-shadow flex flex-wrap items-center gap-3 rounded border border-edge bg-panel p-4">
               <div>
                 <h2 className="text-sm font-medium">Responsive Health</h2>
-                <p className="text-2xl font-bold" aria-live="polite">
+                <p className="font-tech text-2xl font-bold" aria-live="polite">
                   {scan.health.score} / 100
                 </p>
               </div>
-              <div className="ml-auto flex gap-2">
+              <div className="ml-auto flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={copyAllErrors}
+                  disabled={totalDiagnostics === 0}
+                  className="rounded bg-accent px-3 py-1.5 text-sm font-semibold text-accent-ink disabled:opacity-50"
+                >
+                  Copy all errors ({totalDiagnostics})
+                </button>
+                <button
+                  type="button"
+                  onClick={copySelectedErrors}
+                  disabled={selectedIssues.size === 0}
+                  className="rounded border border-edge-strong px-3 py-1.5 text-sm disabled:opacity-50"
+                >
+                  Copy selected ({selectedIssues.size})
+                </button>
+                <button
+                  type="button"
+                  onClick={copyReport}
+                  className="rounded border border-edge-strong px-3 py-1.5 text-sm"
+                >
+                  Copy AI report
+                </button>
                 <button
                   onClick={() => void runBaseline()}
                   disabled={loading}
-                  className="rounded border border-neutral-700 px-3 py-1.5 text-sm"
+                  className="rounded border border-edge-strong px-3 py-1.5 text-sm"
                 >
                   Create baseline (B)
                 </button>
                 <button
                   onClick={() => void runTest()}
                   disabled={loading}
-                  className="rounded border border-neutral-700 px-3 py-1.5 text-sm"
+                  className="rounded border border-edge-strong px-3 py-1.5 text-sm"
                 >
                   Run visual test (T)
                 </button>
               </div>
             </div>
+            {copyStatus && (
+              <p role="status" className={statusClass}>
+                {copyStatus.message}
+              </p>
+            )}
             {testReport && (
-              <pre className="whitespace-pre-wrap rounded border border-neutral-800 bg-neutral-900 p-4 text-sm">
+              <pre className="whitespace-pre-wrap break-words rounded border border-edge bg-panel p-4 font-tech text-sm">
                 {testReport}
               </pre>
             )}
@@ -400,20 +595,20 @@ export default function App() {
               {scan.results.map((r) => (
                 <article
                   key={r.viewport.id}
-                  className="overflow-hidden rounded border border-neutral-800 bg-neutral-900"
+                  className="panel-shadow overflow-hidden rounded border border-edge bg-panel"
                 >
-                  <header className="flex items-center justify-between border-b border-neutral-800 px-3 py-2">
+                  <header className="flex items-center justify-between border-b border-edge px-3 py-2">
                     <div>
                       <h3 className="text-sm font-semibold">
                         {r.viewport.name}
                       </h3>
-                      <p className="text-xs text-neutral-400">
+                      <p className="font-tech text-xs text-ink-muted">
                         {r.viewport.width}×{r.viewport.height} · {r.loadTimeMs}
                         ms
                       </p>
                     </div>
                     <span
-                      className={`rounded px-2 py-0.5 text-xs ${r.issues.length === 0 ? "bg-emerald-900 text-emerald-200" : "bg-amber-900 text-amber-200"}`}
+                      className={`rounded px-2 py-0.5 text-xs ${r.issues.length === 0 ? "bg-ok-bg text-ok-ink" : "bg-warn-bg text-warn-ink"}`}
                     >
                       {r.issues.length === 0
                         ? "OK"
@@ -428,42 +623,79 @@ export default function App() {
                       loading="lazy"
                     />
                   ) : (
-                    <p className="p-3 text-sm text-neutral-400">
+                    <p className="p-3 text-sm text-ink-muted">
                       Screenshot saved: {r.screenshot.screenshotPath}
                     </p>
                   )}
-                  <div className="space-y-1 px-3 py-2">
+                  <div className="px-3 py-2">
                     {r.issues.length === 0 && (
-                      <p className="text-xs text-neutral-400">
+                      <p className="text-xs text-ink-muted">
                         No potential issues detected.
                       </p>
                     )}
-                    {r.issues.slice(0, 5).map((i, idx) => (
-                      <p key={idx} className="text-xs text-neutral-300">
-                        <span className="font-medium text-amber-300">
-                          [{i.severity}] {i.type}:
-                        </span>{" "}
-                        {i.message}{" "}
-                        {i.selector && (
-                          <span className="text-neutral-500">
-                            ({i.selector})
-                          </span>
-                        )}
-                      </p>
-                    ))}
+                    {r.issues.length > 0 && (
+                      <ul className="space-y-2">
+                        {r.issues.map((issue, idx) => {
+                          const key = `${r.viewport.id}#${idx}`;
+                          return (
+                            <li key={key} className="flex items-start gap-2">
+                              <input
+                                type="checkbox"
+                                checked={selectedIssues.has(key)}
+                                onChange={() => toggleIssue(key)}
+                                className="mt-0.5 h-3.5 w-3.5 shrink-0 accent-accent"
+                                aria-label={`Select diagnostic ${idx + 1} of ${r.issues.length} for ${r.viewport.name}`}
+                              />
+                              <p className="font-tech min-w-0 flex-1 break-words text-xs text-ink-soft">
+                                <span className="font-medium text-warn-strong">
+                                  [{issue.severity}] {issue.type}:
+                                </span>{" "}
+                                {issue.message}{" "}
+                                {issue.selector && (
+                                  <span className="text-ink-dim">
+                                    ({issue.selector})
+                                  </span>
+                                )}
+                                {issue.evidence && (
+                                  <span className="block text-ink-dim">
+                                    {issue.evidence}
+                                  </span>
+                                )}
+                              </p>
+                              <button
+                                type="button"
+                                onClick={() => void copyOne(key, issue)}
+                                className="shrink-0 rounded border border-edge-strong px-1.5 py-0.5 text-xs"
+                                aria-label={`Copy diagnostic: ${issue.type} for ${r.viewport.name}`}
+                              >
+                                Copy
+                              </button>
+                              {rowStatus?.key === key && (
+                                <span
+                                  role="status"
+                                  className={`shrink-0 text-xs ${rowStatus.kind === "ok" ? "text-ok-ink" : "text-danger"}`}
+                                >
+                                  {rowStatus.message}
+                                </span>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
                   </div>
                 </article>
               ))}
             </div>
 
             {scan.results.length >= 2 && (
-              <div className="rounded border border-neutral-800 bg-neutral-900 p-4">
+              <div className="panel-shadow rounded border border-edge bg-panel p-4">
                 <h2 className="text-sm font-medium">Compare screenshots</h2>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {scan.results.map((r) => (
                     <button
                       key={r.viewport.id}
-                      className="rounded border border-neutral-700 px-2 py-1 text-xs"
+                      className="rounded border border-edge-strong px-2 py-1 text-xs"
                       onClick={() => {
                         const others = scan.results.filter(
                           (x) => x.viewport.id !== r.viewport.id,
@@ -481,7 +713,7 @@ export default function App() {
                     role="dialog"
                     aria-label="Screenshot comparison"
                   >
-                    <p className="text-xs text-neutral-400">
+                    <p className="text-xs text-ink-muted">
                       {compare.a.viewport.name} ↔ {compare.b.viewport.name} ·
                       Esc to close
                     </p>
@@ -517,7 +749,7 @@ export default function App() {
                         aria-label="Overlay opacity"
                       />
                       <div
-                        className="relative mt-2 overflow-hidden border border-neutral-700"
+                        className="relative mt-2 overflow-hidden border border-edge-strong"
                         style={{ aspectRatio: "16/9" }}
                       >
                         {compare.a.screenshotBase64 && (
@@ -549,7 +781,7 @@ export default function App() {
                         aria-label="Comparison slider"
                       />
                       <div
-                        className="relative mt-2 overflow-hidden border border-neutral-700"
+                        className="relative mt-2 overflow-hidden border border-edge-strong"
                         style={{ aspectRatio: "16/9" }}
                       >
                         {compare.b.screenshotBase64 && (
@@ -582,30 +814,32 @@ export default function App() {
 
         <section
           aria-label="Breakpoint ruler"
-          className="rounded border border-neutral-800 bg-neutral-900 p-4"
+          className="panel-shadow rounded border border-edge bg-panel p-4"
         >
           <h2 className="text-sm font-medium">Breakpoint ruler</h2>
           <div
-            className="relative mt-3 h-8 rounded bg-neutral-950"
+            className="relative mt-3 h-8 rounded bg-inset"
             role="img"
             aria-label="Common breakpoints: 320, 390, 430, 768, 1024, 1280, 1440, 1920 pixels"
           >
             {[320, 390, 430, 768, 1024, 1280, 1440, 1920].map((w) => (
               <div
                 key={w}
-                className="absolute top-0 h-full border-l border-sky-800"
+                className="absolute top-0 h-full border-l border-rule"
                 style={{ left: `${(w / 2000) * 100}%` }}
               >
-                <span className="ml-1 text-[10px] text-neutral-400">{w}</span>
+                <span className="font-tech ml-1 text-[10px] text-ink-muted">
+                  {w}
+                </span>
               </div>
             ))}
           </div>
-          <p className="mt-2 text-xs text-neutral-500">
+          <p className="mt-2 text-xs text-ink-dim">
             Ruler shows common breakpoints. Interactive editing is planned.
           </p>
         </section>
 
-        <footer className="text-xs text-neutral-500">
+        <footer className="text-xs text-ink-dim">
           <p>
             Shortcuts: R re-run · S screenshot · B baseline · T visual test ·
             Esc close modal. MadScope is local-first: no telemetry, screenshots
