@@ -211,6 +211,9 @@ npm install
 npx playwright install chromium
 ```
 
+After installation, follow the [Quick start](#quick-start) section below to launch the desktop UI. Start both the render server and the UI in separate terminal sessions. The Rust toolchain and platform WebView dependencies are only required for the native Tauri development/build commands described later in this README.
+
+
 ## Quick start
 
 **Desktop UI:**
