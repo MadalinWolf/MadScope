@@ -7,22 +7,23 @@ MadScope renders any URL in real Chromium across multiple viewport sizes, captur
 ![MadScope overview — responsive scan with health score](docs/images/madscope-overview.png)
 
 **Status:** v1.1.0 — three themes, shareable diagnostics with AI-ready report, desktop app (Windows/macOS/Linux installers via GitHub Releases), CLI, visual regression, automated tests.
+**Preview:** v1.1.1-preview.1 — first build with the theme renamed _Existing → Default_ and the new _About MadScope_ panel (see Download below).
 **License:** MIT — free and open source.
 
 ## Download MadScope
 
-Latest release: [v1.1.0](https://github.com/MadalinWolf/MadScope/releases/tag/v1.1.0) · [all downloads](https://github.com/MadalinWolf/MadScope/releases)
+**Downloads below serve the preview build [v1.1.1-preview.1](https://github.com/MadalinWolf/MadScope/releases/tag/v1.1.1-preview.1)** · stable release: [v1.1.0](https://github.com/MadalinWolf/MadScope/releases/tag/v1.1.0) · [all downloads](https://github.com/MadalinWolf/MadScope/releases)
 
-| Platform                    | Download                                                                                                                                      |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| Windows x64 (MSI installer) | [MadScope-1.1.0-windows-x64.msi](https://github.com/MadalinWolf/MadScope/releases/download/v1.1.0/MadScope-1.1.0-windows-x64.msi)             |
-| Windows x64 (setup wizard)  | [MadScope-1.1.0-windows-x64-setup.exe](https://github.com/MadalinWolf/MadScope/releases/download/v1.1.0/MadScope-1.1.0-windows-x64-setup.exe) |
-| macOS Apple Silicon         | [MadScope-1.1.0-macos-arm64.dmg](https://github.com/MadalinWolf/MadScope/releases/download/v1.1.0/MadScope-1.1.0-macos-arm64.dmg)             |
-| macOS Intel                 | [MadScope-1.1.0-macos-x64.dmg](https://github.com/MadalinWolf/MadScope/releases/download/v1.1.0/MadScope-1.1.0-macos-x64.dmg)                 |
-| Linux x64 (portable)        | [MadScope-1.1.0-linux-x64.AppImage](https://github.com/MadalinWolf/MadScope/releases/download/v1.1.0/MadScope-1.1.0-linux-x64.AppImage)       |
-| Linux x64 (Debian/Ubuntu)   | [MadScope-1.1.0-linux-x64.deb](https://github.com/MadalinWolf/MadScope/releases/download/v1.1.0/MadScope-1.1.0-linux-x64.deb)                 |
+| Platform                    | Download                                                                                                                                                                    |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Windows x64 (MSI installer) | [MadScope-1.1.1-preview.1-windows-x64.msi](https://github.com/MadalinWolf/MadScope/releases/download/v1.1.1-preview.1/MadScope-1.1.1-preview.1-windows-x64.msi)             |
+| Windows x64 (setup wizard)  | [MadScope-1.1.1-preview.1-windows-x64-setup.exe](https://github.com/MadalinWolf/MadScope/releases/download/v1.1.1-preview.1/MadScope-1.1.1-preview.1-windows-x64-setup.exe) |
+| macOS Apple Silicon         | [MadScope-1.1.1-preview.1-macos-arm64.dmg](https://github.com/MadalinWolf/MadScope/releases/download/v1.1.1-preview.1/MadScope-1.1.1-preview.1-macos-arm64.dmg)             |
+| macOS Intel                 | [MadScope-1.1.1-preview.1-macos-x64.dmg](https://github.com/MadalinWolf/MadScope/releases/download/v1.1.1-preview.1/MadScope-1.1.1-preview.1-macos-x64.dmg)                 |
+| Linux x64 (portable)        | [MadScope-1.1.1-preview.1-linux-x64.AppImage](https://github.com/MadalinWolf/MadScope/releases/download/v1.1.1-preview.1/MadScope-1.1.1-preview.1-linux-x64.AppImage)       |
+| Linux x64 (Debian/Ubuntu)   | [MadScope-1.1.1-preview.1-linux-x64.deb](https://github.com/MadalinWolf/MadScope/releases/download/v1.1.1-preview.1/MadScope-1.1.1-preview.1-linux-x64.deb)                 |
 
-> macOS builds are unsigned: on first launch, right-click → **Open** → **Open**. Verify downloads against `CHECKSUMS.txt` on the release page.
+> ⚠️ **These are preview (testing) builds, not stable releases.** They have **not** been install-tested in an isolated VM and have **not** been confirmed free of behavioral antivirus detections — a Kaspersky report (`PDM:Trojan.Win32.Generic`) against the v1.1.0 Windows installer is still under vendor review with no confirmed false positive. Verify each download's SHA-256 against `SHA256SUMS.txt` (or `CHECKSUMS.txt`) on the [preview release page](https://github.com/MadalinWolf/MadScope/releases/tag/v1.1.1-preview.1) before installing, and keep your antivirus enabled. The stable v1.1.0 installers remain available on the [v1.1.0 release page](https://github.com/MadalinWolf/MadScope/releases/tag/v1.1.0). macOS builds are unsigned: on first launch, right-click → **Open** → **Open**. Verified facts and next steps: [SECURITY_AUDIT.md](SECURITY_AUDIT.md).
 
 ---
 
@@ -344,7 +345,9 @@ Native installers are published via [GitHub Releases](https://github.com/Madalin
 
 ## Roadmap
 
-Done in v1.1.0: three themes (Existing/Terminal/Light) with persistence, selectable diagnostics with copy-all/copy-selected and an AI-ready inspection report.
+Done in v1.1.1-preview.1 (preview build): theme label renamed _Existing → Default_ (internal id and saved preferences unchanged) and the _About MadScope_ panel.
+
+Done in v1.1.0: three themes (Default/Terminal/Light) with persistence, selectable diagnostics with copy-all/copy-selected and an AI-ready inspection report.
 
 Done in v1.0.1: core engine, browser automation, screenshots + history, issue detection + score, comparison UI, baselines + regression, config, CLI, desktop installers, docs, tests.
 
