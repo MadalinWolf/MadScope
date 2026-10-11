@@ -180,10 +180,36 @@ identical pinned build steps and uploads the installers + checksums + engine
 inventory as private workflow artifacts — for antivirus submission or VM
 testing. It can never modify a release.
 
-## 10. Changelog of this audit
+## 10. Verification results of this audit (2026-10-11)
+
+Performed on `master` @ `a607336`. **CI success is not a safety guarantee** —
+these results show the build behaves as documented, not that it is benign.
+
+| Check                                                                                    | Result                                                                                                                                                                                                                                      |
+| ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Format / lint / typecheck / unit tests                                                   | ✅ all green — 73/73 tests (incl. 11 new `build-security` tests)                                                                                                                                                                            |
+| Production build (`npm run build`)                                                       | ✅ exit 0                                                                                                                                                                                                                                   |
+| CI on push (`a607336`, run 38136390664)                                                  | ✅ success                                                                                                                                                                                                                                  |
+| Windows installer build via CI (run 38136476510, `build-windows.yml`, workflow_dispatch) | ✅ success, 11.7 min, all 12 steps green with SHA-pinned actions                                                                                                                                                                            |
+| Node.js archive verification in CI                                                       | ✅ `2b8f2256…eaece9b8` matched both the in-repo pin and nodejs.org `SHASUMS256.txt`; no `MISMATCH` line in log                                                                                                                              |
+| Engine component inventory                                                               | ✅ 475 files, 9 executables (incl. `node.exe b3b117a0…` = official standalone `node.exe` hash, `ffmpeg 7ccd7bbf…` = Playwright-published ffmpeg-1013 hash, `chrome-headless-shell.exe`, `PrintDeps.exe`/winldd, 5 Chromium DLLs)            |
+| Fresh artifacts (private workflow artifact, **not** a release)                           | `MadScope_1.1.0_x64_en-US.msi` = `ac07d56ef08527a95c201ad0d88f4a4ac2f594d7804e5fe8e4e5f4eab8bd50ca`; `MadScope_1.1.0_x64-setup.exe` = `e142a521c6777c55205b89527ca12f8b464be8781af383dd8097abd82800e065`                                    |
+| Contents comparison vs v1.1.0 release                                                    | Same two artifact types (MSI + NSIS setup) and same bundle layout; raw Tauri names here — canonical renaming + `CHECKSUMS.txt` are release-job steps, untouched. Hashes differ from v1.1.0 as expected (source + engine inventory changed). |
+| Publication guard                                                                        | ✅ releases unchanged (`v1.1.0`, `v1.0.1` only); tags `v1.1.0, v1.0.1, v1.0.0`; no assets replaced                                                                                                                                          |
+| Static execution test of the installer                                                   | ❌ **not performed** — no isolated disposable Windows VM available in this environment; the flagged installer was never downloaded or run on this machine                                                                                   |
+
+Limitations (see §6): CI success covers behavior of the pipeline only; the
+installers were not opened, executed, or scanned locally; the fresh artifacts
+above sit in the workflow artifact store awaiting owner review / VM testing /
+antivirus submission.
+
+## 11. Changelog of this audit
 
 - 2026-10-11: initial audit; findings C1–C8; R1–R6 documented; workflows pinned
   and least-privilege; provenance attestation added (non-blocking);
   `build-windows.yml` added; `tests/unit/build-security.test.ts` enforces
   pinning/hardening; `shell-quote`/`concurrently` lockfile fix. Detection
   recorded, vendor submission pending, release flagged as under investigation.
+- 2026-10-11 (later): local Kaspersky reproduction recorded (§1); full
+  verification suite run and results recorded in §10; `master` @ `a607336`
+  pushed. Still no release published.
