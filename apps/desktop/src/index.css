@@ -3,17 +3,20 @@
 @tailwind utilities;
 
 /* ---------------------------------------------------------------------------
-   Themes — exactly three: Existing (default), Terminal, Light.
-   Selected theme is the `data-theme` attribute on <html> (see src/lib/themes.ts
-   and the small bootstrap script in index.html). Colors are RGB triplets wired
-   into Tailwind via tailwind.config.js as `rgb(var(--c-*) / <alpha-value>)`,
-   so every utility (including alpha variants) honours the active theme.
+   Themes — exactly three: Default (the original design), Terminal, Light.
+   The Default theme keeps the internal id `existing` so preferences saved by
+   earlier releases keep working. Selected theme is the `data-theme` attribute
+   on <html> (see src/lib/themes.ts and the small bootstrap script in
+   index.html). Colors are RGB triplets wired into Tailwind via
+   tailwind.config.js as `rgb(var(--c-*) / <alpha-value>)`, so every utility
+   (including alpha variants) honours the active theme.
 --------------------------------------------------------------------------- */
 
 :root,
 [data-theme="existing"] {
   color-scheme: dark;
-  /* Existing theme — byte-for-byte the original MadScope palette. */
+  /* Default theme (internal id `existing`) — byte-for-byte the original
+     MadScope palette. */
   --c-app: 10 10 10; /* neutral-950 */
   --c-panel: 23 23 23; /* neutral-900 */
   --c-inset: 10 10 10; /* neutral-950 */

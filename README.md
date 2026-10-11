@@ -152,7 +152,7 @@ Options: `--viewport`, `--width`/`--height`, `--device mobile`, `--full-page`, `
 
 ### Desktop application
 
-React + Tailwind UI (also wrapped as a Tauri desktop app): URL bar with validation, viewport picker, theme selector, live results with health score, diagnostic copy controls, baseline/test actions, comparison views, keyboard shortcuts (`R` re-run, `S` screenshot, `B` baseline, `T` test, `Esc` close).
+React + Tailwind UI (also wrapped as a Tauri desktop app): URL bar with validation, viewport picker, theme selector, live results with health score, diagnostic copy controls, baseline/test actions, comparison views, keyboard shortcuts (`R` re-run, `S` screenshot, `B` baseline, `T` test, `Esc` close). An **About MadScope** panel above the footer shows the app version, MIT license, the Madwolf Studios website, the GitHub repository and acknowledgments.
 
 ### Themes
 
@@ -160,7 +160,7 @@ A **Theme** selector in the header offers exactly three choices:
 
 | Theme    | Look                                                                                                                                                                                     |
 | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Existing | The original MadScope dark design — the default, unchanged for existing users                                                                                                            |
+| Default  | The original MadScope dark design — still the default, unchanged (internal id stays `existing` so saved preferences keep working; the label was renamed from "Existing")                 |
 | Terminal | Near-black green-tinted charcoal, terminal-green accents, monospaced type for technical elements (URLs, dimensions, diagnostics, reports), clearly distinct success/warning/error colors |
 | Light    | Bright white surfaces, dark readable text, subtle borders, restrained shadow on panels, accessible error/warning/success colors                                                          |
 
@@ -298,15 +298,19 @@ All screenshots below are real MadScope output (deterministic local fixtures, no
 | --------------------------------------------------------------- |
 | ![MadScope visual comparison](docs/images/madscope-compare.png) |
 
-| Existing theme                                                      | Terminal theme                                                      | Light theme                                                   |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------- |
-| ![MadScope existing theme](docs/images/madscope-existing-theme.png) | ![MadScope terminal theme](docs/images/madscope-terminal-theme.png) | ![MadScope light theme](docs/images/madscope-light-theme.png) |
+| Default theme (v1.1.0 capture, then labelled "Existing")           | Terminal theme                                                      | Light theme                                                   |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------- | ------------------------------------------------------------- |
+| ![MadScope default theme](docs/images/madscope-existing-theme.png) | ![MadScope terminal theme](docs/images/madscope-terminal-theme.png) | ![MadScope light theme](docs/images/madscope-light-theme.png) |
 
 | Mobile viewport inspection with real diagnostics                            | Copy controls + AI-report feedback                            |
 | --------------------------------------------------------------------------- | ------------------------------------------------------------- |
 | ![MadScope mobile diagnostics](docs/images/madscope-mobile-diagnostics.png) | ![MadScope copy report](docs/images/madscope-copy-report.png) |
 
-The theme and diagnostics screenshots are real captures of the running app inspecting this project's live MadScope page (`https://madwolfstudios.com/projects/madscope/`).
+| About MadScope panel                                          |
+| ------------------------------------------------------------- |
+| ![MadScope about panel](docs/images/madscope-about-panel.png) |
+
+The theme, diagnostics and About screenshots are real captures of the running app inspecting this project's live MadScope page (`https://madwolfstudios.com/projects/madscope/`).
 
 ## Development
 

@@ -16,6 +16,7 @@ import {
   type ReportIssue,
 } from "./lib/report";
 import { copyText } from "./lib/clipboard";
+import { ABOUT } from "./lib/about";
 
 type ApiViewport = { id: string; name: string; width: number; height: number };
 type ScanIssue = {
@@ -837,6 +838,47 @@ export default function App() {
           <p className="mt-2 text-xs text-ink-dim">
             Ruler shows common breakpoints. Interactive editing is planned.
           </p>
+        </section>
+
+        <section
+          aria-label="About MadScope"
+          className="panel-shadow rounded border border-edge bg-panel p-4"
+        >
+          <h2 className="text-sm font-medium">About MadScope</h2>
+          <p className="mt-1 text-sm text-ink-soft">{ABOUT.description}</p>
+          <p className="mt-2 text-xs text-ink-muted">
+            Version v{ABOUT.version} · {ABOUT.license} license · A{" "}
+            <a
+              href={ABOUT.websiteUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${ABOUT.studio} official website (opens in a new tab)`}
+              className="font-medium text-accent underline-offset-2 hover:underline"
+            >
+              {ABOUT.studio}
+            </a>{" "}
+            project ·{" "}
+            <a
+              href={ABOUT.repositoryUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`MadScope GitHub repository (opens in a new tab)`}
+              className="font-medium text-accent underline-offset-2 hover:underline"
+            >
+              Source on GitHub
+            </a>{" "}
+            ·{" "}
+            <a
+              href={ABOUT.licenseUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${ABOUT.license} license text (opens in a new tab)`}
+              className="text-accent underline-offset-2 hover:underline"
+            >
+              License
+            </a>
+          </p>
+          <p className="mt-1 text-xs text-ink-dim">{ABOUT.acknowledgments}</p>
         </section>
 
         <footer className="text-xs text-ink-dim">

@@ -1,11 +1,12 @@
 /**
  * Theme selection for the desktop UI.
  *
- * Exactly three themes exist: `existing` (the original MadScope design and
- * default), `terminal` and `light`. The active theme is written to the
- * document as a `data-theme` attribute; CSS custom properties in
- * `src/index.css` map it to colors. The choice persists in localStorage so it
- * survives refreshes and later visits.
+ * Exactly three themes exist: `existing` (shown as **Default** — the original
+ * MadScope design and default), `terminal` and `light`. The internal id stays
+ * `existing` so preferences saved by earlier releases keep working. The active
+ * theme is written to the document as a `data-theme` attribute; CSS custom
+ * properties in `src/index.css` map it to colors. The choice persists in
+ * localStorage so it survives refreshes and later visits.
  */
 
 export const THEME_IDS = ["existing", "terminal", "light"] as const;
@@ -14,7 +15,7 @@ export type ThemeId = (typeof THEME_IDS)[number];
 export const THEME_STORAGE_KEY = "madscope-theme";
 
 export const THEME_LABELS: Record<ThemeId, string> = {
-  existing: "Existing",
+  existing: "Default",
   terminal: "Terminal",
   light: "Light",
 };

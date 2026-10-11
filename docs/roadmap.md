@@ -1,6 +1,10 @@
 # Roadmap
 
-## 1.1.0 (this release)
+## Unreleased (on master)
+
+Theme polish: the original theme's user-facing label is now **Default** (internal id `existing` unchanged, so saved preferences keep working). New **About MadScope** panel with the real version, MIT license, Madwolf Studios and GitHub links plus acknowledgments.
+
+## 1.1.0
 
 Three selectable themes (Existing, Terminal, Light) with instant switching and persistence, selectable/copyable diagnostics with copy-all, copy-selected and an AI-ready inspection report for sharing findings with a coding agent.
 

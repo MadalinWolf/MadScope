@@ -33,6 +33,16 @@ describe("theme set", () => {
     expect(Object.keys(THEME_LABELS)).toHaveLength(3);
   });
 
+  it("shows the user-facing labels Default, Terminal and Light", () => {
+    // The original theme keeps its internal id `existing` (saved preferences
+    // keep working) but is presented as "Default".
+    expect(THEME_IDS.map((id) => THEME_LABELS[id])).toEqual([
+      "Default",
+      "Terminal",
+      "Light",
+    ]);
+  });
+
   it("guards unknown values", () => {
     expect(isThemeId("terminal")).toBe(true);
     expect(isThemeId("light")).toBe(true);
