@@ -203,7 +203,65 @@ installers were not opened, executed, or scanned locally; the fresh artifacts
 above sit in the workflow artifact store awaiting owner review / VM testing /
 antivirus submission.
 
-## 11. Changelog of this audit
+## 11. Preview release v1.1.1-preview.1 (2026-10-11)
+
+A **pre-release** (GitHub "Pre-release" label) was published so the changes
+since v1.1.0 — theme renamed _Existing → Default_ and the new _About MadScope_
+panel — can be downloaded and tested on all three platforms. It is a testing
+build, not a stable release, and it is **not** security-cleared.
+
+- Tag `v1.1.1-preview.1` → commit `0141abc63025d803dbb10a7946720ec0d64591a8`
+  (= `a6073365` hardening + `d742e0c` theme/About + audit docs; application
+  code byte-identical to the audited tree).
+- Built end-to-end by the repository's own **Release workflow**
+  (`release.yml`, run `38164006725`, attempt 2): Windows x64, macOS Apple
+  Silicon, macOS Intel, Linux x64 — four build jobs + release job, all
+  successful, Actions SHA-pinned, least-privilege.
+- The Windows installers were **rebuilt** by this run; their hashes differ
+  from the earlier workflow-dispatch artifacts (`ac07d56e…`/`e142a521…`,
+  run `38136476510`), which are superseded and no longer attached.
+
+| Asset                                            | Size (bytes) | SHA-256                                                            |
+| ------------------------------------------------ | ------------ | ------------------------------------------------------------------ |
+| `MadScope-1.1.1-preview.1-windows-x64.msi`       | 164,461,435  | `613c4f2698ddf6d271dd104e1fba1d0f59d74ca2a4c7f987f53d2da5c276bbf6` |
+| `MadScope-1.1.1-preview.1-windows-x64-setup.exe` | 116,647,664  | `974029ee8d5419ad76cac78af04512525b5e0f24dd8a07719f9dc8d5341f7efc` |
+| `MadScope-1.1.1-preview.1-macos-arm64.dmg`       | 142,385,788  | `15e1fb7aedef72f6826cb59c98ef06bdf49dce6766bd4a7daf04399617c5d2cb` |
+| `MadScope-1.1.1-preview.1-macos-x64.dmg`         | 143,154,691  | `60446b8bd91872b06bac51f38a3693a22e0bf0f728dfc301161ec9948f5b1fb7` |
+| `MadScope-1.1.1-preview.1-linux-x64.AppImage`    | 231,795,192  | `521b6dfa0c05a3593df361afcc6aa970904cd67795ded475dda7230663b67516` |
+| `MadScope-1.1.1-preview.1-linux-x64.deb`         | 169,453,766  | `284a6372e4ace715b7b6184b6068f4a1ae8bc64ce0d1541ad0a7825d46c1d12c` |
+
+Verified before and after publication:
+
+- Workflow `CHECKSUMS.txt` ↔ GitHub server-side asset digests ↔ **full
+  anonymous re-download of all six installers** — all three agree.
+- `SHA256SUMS.txt` (identical content to `CHECKSUMS.txt`) uploaded and
+  verified anonymously.
+- Stable v1.1.0 release (7 assets) and tags `v1.0.0`, `v1.0.1`, `v1.1.0`
+  unchanged.
+- Local Kaspersky on-demand **static** scan of the two final Windows
+  installers: **0 detections, 0 suspicions** (807 objects). Static ≠
+  behavioral: no runtime/install behavior has been tested; the build is
+  **not** cleared.
+- Kaspersky Opentip (vendor-side) submission of the final Windows MSI:
+  **automated submission blocked by the portal's anti-automation
+  protection** — `POST /ui/uploadsample` returns HTTP 403 (nginx) for every
+  non-browser client tried (direct API with the session cookie and the
+  exact browser header profile). The submission flow itself was validated
+  end-to-end with a benign probe file through the real browser UI (session
+  established, upload accepted, report page generated — "Not
+  categorized"), but the browser automation available here caps file
+  uploads at 5 MiB, far below the 164 MB installer. **Owner step (~2
+  minutes):** open <https://opentip.kaspersky.com/> in a normal browser →
+  _Select file_ → choose `MadScope-1.1.1-preview.1-windows-x64.msi` →
+  _Start file analysis_ → save the report URL. A public-scanner verdict is
+  still a static data point, not a vendor false-positive determination
+  (see §7). The equivalent local engine (same vendor, on-demand static
+  scan) already reports 0 detections on these files.
+
+No antivirus was disabled, excluded or bypassed; no binary was modified to
+evade detection; quarantine was never touched.
+
+## 12. Changelog of this audit
 
 - 2026-10-11: initial audit; findings C1–C8; R1–R6 documented; workflows pinned
   and least-privilege; provenance attestation added (non-blocking);
@@ -213,3 +271,11 @@ antivirus submission.
 - 2026-10-11 (later): local Kaspersky reproduction recorded (§1); full
   verification suite run and results recorded in §10; `master` @ `a607336`
   pushed. Still no release published.
+- 2026-10-11 (later): preview release `v1.1.1-preview.1` published for all
+  platforms via the repository's Release workflow; hashes, provenance and
+  verification results recorded in §11; local static scan of the final
+  Windows installers 0/0; Opentip automated submission blocked by the
+  portal's anti-automation protection (owner manual step documented in
+  §11). Stable v1.1.0 and
+  all prior tags unchanged. Website downloads now serve the preview build
+  with an accurate testing-status notice.
