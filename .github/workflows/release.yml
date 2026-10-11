@@ -6,6 +6,13 @@
 # Artifacts are renamed to canonical names (see RELEASE_NOTES.md) and the
 # release body comes from RELEASE_NOTES.md with CHECKSUMS.txt attached.
 # No secrets are required: macOS builds are unsigned (documented).
+#
+# Security posture (see SECURITY_AUDIT.md):
+# - Actions are pinned to full commit SHAs (version comments are informational).
+# - Least-privilege permissions: read-only by default, write only for the job
+#   that publishes the release and its provenance attestation.
+# - build-sidecar.mjs verifies downloaded Node.js archives against pinned
+#   SHA-256 hashes and emits a component inventory (uploaded per platform).
 name: Release
 
 on:
@@ -14,7 +21,7 @@ on:
       - "v*.*.*"
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -36,19 +43,19 @@ jobs:
             target: x86_64-unknown-linux-gnu
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
 
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@686976e191b89faba57d3206551f0f330d8cb249 # stable as of 2026-10-09
         with:
           targets: ${{ matrix.target }}
 
       - name: Cache Rust build
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
         with:
           workspaces: apps/desktop/src-tauri
           key: ${{ matrix.target }}
@@ -70,7 +77,7 @@ jobs:
         run: node scripts/build-sidecar.mjs --platform=${{ matrix.platform }}
 
       - name: Build Tauri bundles
-        uses: tauri-apps/tauri-action@v0
+        uses: tauri-apps/tauri-action@84b9d35b5fc46c1e45415bdb6144030364f7ebc5 # v0
         with:
           projectPath: apps/desktop
           args: --target ${{ matrix.target }}
@@ -112,7 +119,7 @@ jobs:
           tmp=$(mktemp -d) && (cd "$tmp" && "$ROOT/$APP" --appimage-extract >/dev/null) && ls "$tmp/squashfs-root/usr/bin"
 
       - name: Upload raw bundles
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: bundles-${{ matrix.platform }}
           path: |
@@ -123,13 +130,26 @@ jobs:
             apps/desktop/src-tauri/target/*/release/bundle/deb/*.deb
           if-no-files-found: error
 
+      - name: Upload engine component inventory
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: engine-inventory-${{ matrix.platform }}
+          path: apps/desktop/src-tauri/resources/engine/inventory.json
+          if-no-files-found: error
+
   release:
     needs: build
     runs-on: ubuntu-latest
+    # Least privilege: only the publishing job gets write access (release +
+    # provenance attestation via OIDC). Build jobs stay read-only.
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           pattern: bundles-*
           merge-multiple: true
@@ -153,8 +173,18 @@ jobs:
           test "$(ls assets | wc -l)" -eq 6
           (cd assets && sha256sum * > CHECKSUMS.txt && cat CHECKSUMS.txt)
 
+      - name: Attest build provenance of release assets
+        # Signed provenance (SLSA) for every asset; verifiable with:
+        #   gh attestation verify <asset> --repo MadalinWolf/MadScope
+        # continue-on-error until verified on a real release — remove the
+        # flag once a tagged release has passed with attestation enabled.
+        continue-on-error: true
+        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
+        with:
+          subject-path: assets/*
+
       - name: Publish GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           tag_name: ${{ github.ref_name }}
           name: MadScope ${{ github.ref_name }}

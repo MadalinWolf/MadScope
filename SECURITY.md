@@ -4,7 +4,16 @@
 
 | Version | Supported |
 | ------- | --------- |
-| 0.1.x   | Yes       |
+| 1.1.x   | Yes       |
+
+## Security Audits
+
+Build-chain audits, the software-component inventory, and the ongoing antivirus
+false-positive investigation for the v1.1.0 Windows installer are documented in
+[`SECURITY_AUDIT.md`](SECURITY_AUDIT.md). The v1.1.0 Windows installers are
+currently **flagged as under investigation** (Kaspersky `PDM:Trojan.Win32.Generic`
+report) — see that file for verified facts, open questions, and the vendor
+submission procedure.
 
 ## Reporting a Vulnerability
 

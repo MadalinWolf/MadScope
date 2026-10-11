@@ -1,0 +1,79 @@
+# On-demand Windows installer build. Runs the exact same steps as the
+# Release workflow (same pinned actions, same scripts) but NEVER publishes:
+# no tag, no release, no assets are modified. Outputs are private workflow
+# artifacts for inspection (antivirus submission, VM testing, comparison).
+#
+# Trigger manually: Actions → "Build Windows installer" → Run workflow.
+name: Build Windows installer
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-win:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@686976e191b89faba57d3206551f0f330d8cb249 # stable as of 2026-10-09
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
+        with:
+          workspaces: apps/desktop/src-tauri
+          key: x86_64-pc-windows-msvc
+
+      - name: Install workspace dependencies
+        run: npm ci
+
+      - name: Build packages, CLI and desktop UI
+        run: npm run build
+
+      - name: Build desktop engine bundle (Node + server + Chromium)
+        working-directory: apps/desktop
+        run: node scripts/build-sidecar.mjs --platform=win
+
+      - name: Build Tauri bundles
+        uses: tauri-apps/tauri-action@84b9d35b5fc46c1e45415bdb6144030364f7ebc5 # v0
+        with:
+          projectPath: apps/desktop
+          args: --target x86_64-pc-windows-msvc
+
+      - name: Validate artifacts and print SHA-256 checksums
+        shell: pwsh
+        run: |
+          $msi = Get-ChildItem apps/desktop/src-tauri/target/*/release/bundle/msi/*.msi
+          $exe = Get-ChildItem apps/desktop/src-tauri/target/*/release/bundle/nsis/*-setup.exe
+          $out = "ci-checksums.txt"
+          foreach ($f in @($msi) + @($exe)) {
+            if (-not $f) { throw "missing installer artifact" }
+            $hash = (Get-FileHash -Algorithm SHA256 $f.FullName).Hash.ToLower()
+            "$hash  $($f.Name)" | Tee-Object -FilePath $out -Append
+          }
+
+      - name: Upload engine component inventory
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: engine-inventory-win
+          path: apps/desktop/src-tauri/resources/engine/inventory.json
+          if-no-files-found: error
+
+      - name: Upload installers for inspection (not a release)
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: windows-installers-ci-only
+          path: |
+            apps/desktop/src-tauri/target/*/release/bundle/msi/*.msi
+            apps/desktop/src-tauri/target/*/release/bundle/nsis/*-setup.exe
+            ci-checksums.txt
+          if-no-files-found: error

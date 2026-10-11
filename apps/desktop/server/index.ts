@@ -232,6 +232,19 @@ app.post("/api/diff", async (req, res) => {
   }
 });
 
-app.listen(PORT, "127.0.0.1", () => {
+// Loopback-only binding is a security boundary: the engine can render
+// arbitrary URLs and read local files for diffs, so it must never be
+// reachable from the network. Do not change the host without review.
+const server = app.listen(PORT, "127.0.0.1", () => {
   console.log(`MadScope render server listening on http://127.0.0.1:${PORT}`);
 });
+
+// Graceful shutdown for CLI/dev usage. (The desktop app kills this child
+// process directly on exit, see src-tauri/src/lib.rs.) Closing the server
+// first releases the port cleanly.
+for (const signal of ["SIGINT", "SIGTERM"] as const) {
+  process.on(signal, () => {
+    server.close(() => process.exit(0));
+    setTimeout(() => process.exit(0), 2000).unref();
+  });
+}

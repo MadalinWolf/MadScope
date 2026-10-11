@@ -4,6 +4,8 @@
 
 Theme polish: the original theme's user-facing label is now **Default** (internal id `existing` unchanged, so saved preferences keep working). New **About MadScope** panel with the real version, MIT license, Madwolf Studios and GitHub links plus acknowledgments.
 
+Supply-chain hardening after the v1.1.0 antivirus investigation (see [`SECURITY_AUDIT.md`](SECURITY_AUDIT.md)): SHA-256 verification of downloaded build dependencies, GitHub Actions pinned to commit SHAs with least-privilege permissions, signed build provenance attestation, engine component inventory, and an on-demand Windows installer build workflow. Code signing of the Windows installers is the remaining owner-supplied step.
+
 ## 1.1.0
 
 Three selectable themes (Existing, Terminal, Light) with instant switching and persistence, selectable/copyable diagnostics with copy-all, copy-selected and an AI-ready inspection report for sharing findings with a coding agent.
