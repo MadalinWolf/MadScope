@@ -6,13 +6,13 @@ MadScope renders any URL in real Chromium across multiple viewport sizes, captur
 
 ![MadScope overview — responsive scan with health score](docs/images/madscope-overview.png)
 
-**Status:** v1.1.0 — three themes, shareable diagnostics with AI-ready report, desktop app (Windows/macOS/Linux installers via GitHub Releases), CLI, visual regression, automated tests.
-**Preview:** v1.1.1-preview.1 — first build with the theme renamed _Existing → Default_ and the new _About MadScope_ panel (see Download below).
+**Stable release:** v1.1.0 — three themes, shareable diagnostics with AI-ready report, desktop app (Windows/macOS/Linux installers via GitHub Releases), CLI, visual regression, automated tests.
+**Current build:** v1.1.1-preview.1 — theme renamed _Existing → Default_ and the new _About MadScope_ panel; all downloads below serve it (see Download below).
 **License:** MIT — free and open source.
 
 ## Download MadScope
 
-**Downloads below serve the preview build [v1.1.1-preview.1](https://github.com/MadalinWolf/MadScope/releases/tag/v1.1.1-preview.1)** · stable release: [v1.1.0](https://github.com/MadalinWolf/MadScope/releases/tag/v1.1.0) · [all downloads](https://github.com/MadalinWolf/MadScope/releases)
+**Downloads below serve the current build, [v1.1.1-preview.1](https://github.com/MadalinWolf/MadScope/releases/tag/v1.1.1-preview.1)** (theme renamed _Existing → Default_, new _About MadScope_ panel) · previous stable release: [v1.1.0](https://github.com/MadalinWolf/MadScope/releases/tag/v1.1.0) · [all downloads](https://github.com/MadalinWolf/MadScope/releases)
 
 | Platform                    | Download                                                                                                                                                                    |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -23,7 +23,7 @@ MadScope renders any URL in real Chromium across multiple viewport sizes, captur
 | Linux x64 (portable)        | [MadScope-1.1.1-preview.1-linux-x64.AppImage](https://github.com/MadalinWolf/MadScope/releases/download/v1.1.1-preview.1/MadScope-1.1.1-preview.1-linux-x64.AppImage)       |
 | Linux x64 (Debian/Ubuntu)   | [MadScope-1.1.1-preview.1-linux-x64.deb](https://github.com/MadalinWolf/MadScope/releases/download/v1.1.1-preview.1/MadScope-1.1.1-preview.1-linux-x64.deb)                 |
 
-> **Preview builds.** The files above are pre-release builds; the stable release remains [v1.1.0](https://github.com/MadalinWolf/MadScope/releases/tag/v1.1.0). About the antivirus report on the v1.1.0 Windows installer: it was triggered by Kaspersky's _behavioral_ heuristics — not a malware signature — and we believe it is a false positive. The vendor review is still open, so we mention it plainly. The current preview installers scan clean with Kaspersky (0 detections across 807 objects), and our maintainer runs the installed preview on Windows 11 with Kaspersky active with no alerts. For extra assurance, compare each file's SHA-256 against [`SHA256SUMS.txt`](https://github.com/MadalinWolf/MadScope/releases/tag/v1.1.1-preview.1) on the release page. macOS builds are unsigned: on first launch, right-click → **Open** → **Open**. Full evidence: [SECURITY_AUDIT.md](SECURITY_AUDIT.md).
+> **About the antivirus report:** the earlier report concerned the **old v1.1.0 installer only** — `PDM:Trojan.Win32.Generic`, triggered by Kaspersky's _behavioral_ heuristics, not a malware signature. With the current build that issue is gone: the installers scan clean with Kaspersky (0 detections across 807 objects), and our maintainer runs the installed app on Windows 11 with Kaspersky active with no alerts or warnings. We consider the v1.1.0 report a false positive; the vendor's review of that old report is still open, so we mention it plainly. For extra assurance, compare each file's SHA-256 against [`SHA256SUMS.txt`](https://github.com/MadalinWolf/MadScope/releases/tag/v1.1.1-preview.1) on the release page. macOS builds are unsigned: on first launch, right-click → **Open** → **Open**. Full evidence: [SECURITY_AUDIT.md](SECURITY_AUDIT.md).
 
 ---
 
